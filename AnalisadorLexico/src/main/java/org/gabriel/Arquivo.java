@@ -19,7 +19,7 @@ public class Arquivo {
 
     public static void escrever(String caminho, ArrayList<Token> tokens) throws IOException {
         java.io.FileWriter fileWrite = new java.io.FileWriter(caminho);
-        fileWrite.write("Tokens\tlinha\tcoluna\n");
+        fileWrite.write("Tokens\tlinha\tcoluna\ttipo\n");
         for (Token token : tokens) {
             fileWrite.write(String.format("%s\n", token.toString()));
         }

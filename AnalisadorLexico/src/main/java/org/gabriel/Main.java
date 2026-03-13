@@ -21,6 +21,7 @@ public class Main {
             while (i < codigoFonte.length()) {
                 char pivo = codigoFonte.charAt(i);
 
+
                 if (pivo == '\n') {
                     linha++;
                     coluna=0;
@@ -34,6 +35,56 @@ public class Main {
                     j = i;
                     continue;
                 }
+                /*tipos:
+                Identificador
+                Palavra Reservada
+                Numero
+                Literal
+                Comentario
+                Operadores Logicos e aritmeticos
+                Separador
+                */
+               if (pivo == '/'){ // achar comentario
+                   var prox = codigoFonte.charAt(i+1);
+                   if (prox== '/' ){
+                       char batedor = codigoFonte.charAt(j);
+                       while (batedor != '\n'){
+                           j++;
+                           i++;
+                           if (j < codigoFonte.length()) {
+                               batedor = codigoFonte.charAt(j);
+                           }
+                       }
+                       IO.println("Achou comentario de Linha");
+                       continue;
+                   }
+                   if (prox == '*'){
+                       j++;
+                       char batedor = codigoFonte.charAt(j);
+                       while (true){
+                           j++;
+                           i++;
+                           if (j < codigoFonte.length()) {
+                               batedor = codigoFonte.charAt(j);
+                               coluna ++;
+                           }
+                           if (batedor == '\n'){
+                               linha++;
+                               coluna =0;
+                           }
+                           var anterior = codigoFonte.charAt(j-1); // ISSO VAI DAR MERDA!!!
+                           if (anterior == '*' && batedor == '/'){
+                               i+=2;
+                               j=i;
+                               coluna+=2;
+                               IO.println("Achou comentario de bloco");
+                               break;
+                           }
+                       }
+                       continue;
+                   }
+
+               }
 
                 // avança o batedor até encontrar espaço, \n ou fim
                 char batedor = codigoFonte.charAt(j);
@@ -52,7 +103,7 @@ public class Main {
                 }
 
 
-                tokens.add(new Token(newToken.toString(), linha, coluna));
+                tokens.add(new Token(newToken.toString(), linha, coluna, " "));
                 coluna += newToken.length()+1;
             }
 

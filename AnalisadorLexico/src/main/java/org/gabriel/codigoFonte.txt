@@ -1,2 +1,8 @@
-int a = 0 ;
-teste ++ ;
+int x = 10 ;
+// Declaração de string com nome
+String nome = "Gabriel" ;
+/* Verificação condicional
+   para testar */
+if ( x > 5 ) {
+    x = x + 1 ; // Incremento
+}

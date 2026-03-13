@@ -5,15 +5,16 @@ public class Token {
     private String string;
     private int linha;
     private int coluna;
+    private String tipo;
 
-
-    public Token(String string, int linha, int coluna) {
+    public Token(String string, int linha, int coluna, String tipo) {
         this.string = string;
         this.linha = linha;
         this.coluna = coluna;
+        this.tipo = tipo;
+
 
     }
-
 
     public int getColuna() {
         return coluna;
@@ -27,10 +28,19 @@ public class Token {
         return string;
     }
 
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
     @Override
     public String toString() {
         return string +"\t" +
                 linha +"\t" +
-                coluna;
+                coluna +"\t" +
+                tipo;
     }
 }
