@@ -1,25 +1,25 @@
 Tokens	linha	coluna	tipo
-int	0	0	 
-x	0	4	 
-=	0	6	 
-10	0	8	 
-;	0	11	 
-String	2	0	 
-nome	2	7	 
-=	2	12	 
-"Gabriel"	2	14	 
-;	2	24	 
-if	5	0	 
-(	5	3	 
-x	5	5	 
->	5	7	 
-5	5	9	 
-)	5	11	 
-{	5	13	 
-x	6	0	 
-=	6	2	 
-x	6	4	 
-+	6	6	 
-1	6	8	 
-;	6	10	 
-}	7	0	 
+int	0	0	Palavra Reservada
+x	0	4	Identificador
+=	0	6	Operador Logico
+10	0	8	Numero
+;	0	11	Separador
+String	2	0	Identificador
+nome	2	7	Identificador
+=	2	12	Operador Logico
+"Gabriel"	2	14	Literal
+;	2	24	Separador
+if	5	0	Identificador
+(	5	3	Separador
+x	5	5	Identificador
+>	5	7	Operador Logico
+5	5	9	Numero
+)	5	11	Separador
+{	5	13	Separador
+x	6	0	Identificador
+=	6	2	Operador Logico
+x	6	4	Identificador
++	6	6	Operador Aritmetico
+1	6	8	Numero
+;	6	10	Separador
+}	7	0	Separador

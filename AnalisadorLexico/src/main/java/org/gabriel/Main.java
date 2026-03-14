@@ -35,15 +35,7 @@ public class Main {
                     j = i;
                     continue;
                 }
-                /*tipos:
-                Identificador
-                Palavra Reservada
-                Numero
-                Literal
-                Comentario
-                Operadores Logicos e aritmeticos
-                Separador
-                */
+
                if (pivo == '/'){ // achar comentario
                    var prox = codigoFonte.charAt(i+1);
                    if (prox== '/' ){
@@ -97,19 +89,21 @@ public class Main {
 
                 // captura o token entre pivo (i) e batedor (j)
 
-                StringBuilder newToken = new StringBuilder();
+                StringBuilder newString = new StringBuilder();
                 for (; i < j; i++) {
-                    newToken.append(codigoFonte.charAt(i));
+                    newString.append(codigoFonte.charAt(i));
                 }
 
+                Token newToken = new Token(newString.toString(), linha, coluna);
+                tokens.add(newToken);
+                IO.println("Novo Token");
 
-                tokens.add(new Token(newToken.toString(), linha, coluna, " "));
-                coluna += newToken.length()+1;
+                coluna += newString.length()+1;
             }
 
             Arquivo.escrever(caminhoSaida, tokens);
         } catch (Exception e) {
-            System.out.println("Erro ao ler o arquivo: " + e.getMessage());
+            IO.println("Erro ao ler o arquivo: " + e.getMessage());
         }
 
     }
