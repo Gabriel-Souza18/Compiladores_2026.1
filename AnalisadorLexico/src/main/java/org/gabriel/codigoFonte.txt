@@ -1,6 +1,6 @@
-int x = 10 ;
+int x=10;
 // Declaração de string com nome
-String nome = "Gabriel" ;
+String nome="Gabriel" ;
 /* Verificação condicional
    para testar */
 if ( x > 5 ) {

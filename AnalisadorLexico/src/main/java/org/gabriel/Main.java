@@ -1,8 +1,6 @@
 package org.gabriel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -24,15 +22,15 @@ public class Main {
 
                 if (pivo == '\n') {
                     linha++;
-                    coluna=0;
+                    coluna = 0;
                     i++;
                     j = i;
                     continue;
                 }
 
-                if (pivo == ' ') {
+                if (pivo == ' ' || pivo == '\t') {
                     i++;
-                    j = i;
+                    coluna++;
                     continue;
                 }
 
@@ -47,7 +45,7 @@ public class Main {
                                batedor = codigoFonte.charAt(j);
                            }
                        }
-                       IO.println("Achou comentario de Linha");
+                       // IO.println("Achou comentario de Linha");
                        continue;
                    }
                    if (prox == '*'){
@@ -78,33 +76,118 @@ public class Main {
 
                }
 
-                // avança o batedor até encontrar espaço, \n ou fim
-                char batedor = codigoFonte.charAt(j);
-                while (j < codigoFonte.length() && batedor != ' ' && batedor != '\n') {
-                    j++;
-                    if (j < codigoFonte.length()) {
-                        batedor = codigoFonte.charAt(j);
+                j = i;
+                StringBuilder newString = new StringBuilder();
+                newString.append(codigoFonte.charAt(j));
+                j++;
+
+
+                while (j < codigoFonte.length()) {
+
+                    char proxChar = codigoFonte.charAt(j);
+
+                    // Para se encontrar espaço ou quebra de linha
+                    if (proxChar == ' ' || proxChar == '\n' || proxChar == '\t') {
+                        break;
+                    }
+
+                    String tokenAtual = newString.toString();
+                    String tipoAtual = identificarTipo(tokenAtual);
+                    String tipoProx = identificarTipo(String.valueOf(proxChar));
+
+                    //para se o tipo mudar
+                    if (!tipoAtual.equals(tipoProx)) {
+                        // FALTA ESSES AQUI O ++, --, ==, !=, >=, <=
+                        if ((tokenAtual.equals("+") || tokenAtual.equals("-") || tokenAtual.equals("=") ||
+                             tokenAtual.equals("<") || tokenAtual.equals(">") || tokenAtual.equals("!") ||
+                             tokenAtual.equals("&") || tokenAtual.equals("|")) &&
+                            (proxChar == '=' || proxChar == '+' || proxChar == '-' || proxChar == '&' || proxChar == '|')) {
+                            newString.append(proxChar);
+                            j++;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        newString.append(proxChar);
+                        j++;
                     }
                 }
 
-                // captura o token entre pivo (i) e batedor (j)
-
-                StringBuilder newString = new StringBuilder();
-                for (; i < j; i++) {
-                    newString.append(codigoFonte.charAt(i));
-                }
-
-                Token newToken = new Token(newString.toString(), linha, coluna);
+                String token = newString.toString();
+                String tipo = identificarTipo(token);
+                Token newToken = new Token(token, linha, coluna, tipo);
                 tokens.add(newToken);
-                IO.println("Novo Token");
+                IO.println("Token: " + token + " | Tipo: " + tipo);
 
-                coluna += newString.length()+1;
+                i = j;
+                coluna += token.length();
             }
 
             Arquivo.escrever(caminhoSaida, tokens);
         } catch (Exception e) {
             IO.println("Erro ao ler o arquivo: " + e.getMessage());
         }
+    }
 
+    public static String identificarTipo(String token) {
+        // Palavras reservadas
+        if (token.equals("int") || token.equals("for")) {
+            return "PALAVRA_RESERVADA";
+        }
+
+        // Separadores
+        if (token.length() == 1) {
+            char c = token.charAt(0);
+            if (c == '(' || c == ')' || c == '{' || c == '}' || c == '[' || c == ']' || c == ';' || c == ',') {
+                return "SEPARADOR";
+            }
+        }
+
+        // Números
+        if (apenasNumeros(token)) {
+            return "NUMERO";
+        }
+
+        // Operadores aritméticos (simples e compostos)
+        if (ehOperadorAritmetico(token)) {
+            return "OPERADOR_ARITMETICO";
+        }
+
+        // Operadores lógicos (simples e compostos)
+        if (ehOperadorLogico(token)) {
+            return "OPERADOR_LOGICO";
+        }
+
+        // Literais (strings ou caracteres)
+        if ((token.startsWith("\"") && token.endsWith("\"")) ||
+            (token.startsWith("'") && token.endsWith("'"))) {
+            return "LITERAL";
+        }
+
+        // Padrão: identificador
+        return "IDENTIFICADOR";
+    }
+
+    public static boolean apenasNumeros(String token) {
+        for (char c : token.toCharArray()) {
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+        return !token.isEmpty();
+    }
+
+    public static boolean ehOperadorAritmetico(String token) {
+        return token.equals("+") || token.equals("-") || token.equals("*") ||
+               token.equals("/") || token.equals("%") || token.equals("=") ||
+               token.equals("++") || token.equals("--") || token.equals("+=") ||
+               token.equals("-=") || token.equals("*=") || token.equals("/=");
+    }
+
+    public static boolean ehOperadorLogico(String token) {
+        return token.equals("&") || token.equals("|") || token.equals("!=") ||
+               token.equals("<") || token.equals(">") || token.equals("==") ||
+               token.equals("<=") || token.equals(">=") || token.equals("&&") ||
+               token.equals("||") || token.equals("!");
     }
 }
