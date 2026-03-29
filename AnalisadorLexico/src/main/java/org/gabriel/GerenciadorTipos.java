@@ -46,13 +46,13 @@ public class GerenciadorTipos {
         // OPERADOR_ARITMETICO: + - * / % = ++ -- += -= *= /=
         tipos.add(new Tipo("OPERADOR_ARITMETICO",
                 "[+\\-*/%=]",
-                "[+\\-*/%=]+",
+                "(\\+\\+|--|\\+=|-=|\\*=|/=|%=|\\+|-|\\*|/|%|=)",
                 Arrays.asList("NUMERO", "IDENTIFICADOR", "LITERAL", "SEPARADOR")));
 
         // OPERADOR_LOGICO: & | ! < > & | = && || != <= >=
         tipos.add(new Tipo("OPERADOR_LOGICO",
                 "[&|!<>=]",
-                "[&|!<>=]+",
+                "(&&|\\|\\|||!=|==|<=|>=|<|>|!|=|&|\\|)",
                 Arrays.asList("NUMERO", "IDENTIFICADOR", "LITERAL", "SEPARADOR")));
     }
 

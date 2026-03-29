@@ -154,14 +154,17 @@ public class Main {
                                 }
                             }
                             // Trata casos especiais de operadores compostos
-                            else if (temOperadorComposto(tokenAtual, batedor)) {
+                            if (temOperadorComposto(tokenAtual, batedor)) {
                                 tokenBuilder.append(batedor);
                                 j++;
                                 break;
                             }
-                            else {
+                            if (tipoProximo != null && !tipoAtual.getSeparadoresPossiveis().contains(tipoProximo.getName())) {
+                                tokenBuilder.append(batedor);
+                                j++;
                                 break;
                             }
+                            break;
                         }
                     }
                 }
