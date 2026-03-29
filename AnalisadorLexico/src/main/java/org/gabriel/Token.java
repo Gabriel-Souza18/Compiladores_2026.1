@@ -14,15 +14,6 @@ public class Token {
         this.coluna = coluna;
         this.tipo = tipo;
     }
-    /*tipos:
-    Identificador
-    Palavra Reservada
-    Numero
-    Literal
-    Comentario
-    Operadores Logicos e aritmeticos
-    Separador
-    */
 
 
     public int getColuna() {
@@ -52,4 +43,5 @@ public class Token {
                 coluna +"\t" +
                 tipo;
     }
+
 }

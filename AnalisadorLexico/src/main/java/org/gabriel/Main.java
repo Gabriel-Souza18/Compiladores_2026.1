@@ -9,8 +9,10 @@ public class Main {
 
         int linha = 0;
         int coluna = 0;
-        int i = 0; // posiçaão do PIvo
+        int i = 0; // posição do Pivo
         int j = 0; // pos do batedor
+
+        GerenciadorTipos gerenciador = new GerenciadorTipos();
 
         try {
             String codigoFonte = Arquivo.ler(caminhoEntrada);
@@ -18,7 +20,6 @@ public class Main {
 
             while (i < codigoFonte.length()) {
                 char pivo = codigoFonte.charAt(i);
-
 
                 if (pivo == '\n') {
                     linha++;
@@ -35,99 +36,138 @@ public class Main {
                 }
 
                if (pivo == '/'){ // achar comentario
-                   var prox = codigoFonte.charAt(i+1);
-                   if (prox== '/' ){
-                       char batedor = codigoFonte.charAt(j);
-                       while (batedor != '\n'){
-                           j++;
-                           i++;
-                           if (j < codigoFonte.length()) {
-                               batedor = codigoFonte.charAt(j);
+                   if (j + 1 < codigoFonte.length()) {
+                       var prox = codigoFonte.charAt(j + 1);
+                       if (prox == '/' ){
+                           IO.println("COmentario Linha");
+                           while (j < codigoFonte.length() && codigoFonte.charAt(j) != '\n') {
+                               j++;
                            }
+                           i=j;
+                           continue;
                        }
-                       // IO.println("Achou comentario de Linha");
-                       continue;
-                   }
-                   if (prox == '*'){
-                       j++;
-                       char batedor = codigoFonte.charAt(j);
-                       while (true){
-                           j++;
-                           i++;
-                           if (j < codigoFonte.length()) {
-                               batedor = codigoFonte.charAt(j);
-                               coluna ++;
+                       if (prox == '*'){
+                           IO.println("Comentario Bloco");
+                           j += 2;
+                           while (j < codigoFonte.length() - 1) {
+                               if (codigoFonte.charAt(j) == '*' && codigoFonte.charAt(j + 1) == '/') {
+                                   j += 2;
+                                   break;
+                               }
+                               if (codigoFonte.charAt(j) == '\n') {
+                                   linha++;
+                                   coluna = 0;
+                               } else {
+                                   coluna++;
+                               }
+                               j++;
                            }
-                           if (batedor == '\n'){
-                               linha++;
-                               coluna =0;
-                           }
-                           var anterior = codigoFonte.charAt(j-1);
-                           if (anterior == '*' && batedor == '/'){
-                               i+=2;
-                               j=i;
-                               coluna+=2;
-                               IO.println("Achou comentario de bloco");
-                               break;
-                           }
+                           i=j;
+                           continue;
                        }
-                       continue;
                    }
-
                }
 
                 j = i;
                 StringBuilder tokenBuilder = new StringBuilder();
-                tokenBuilder.append(codigoFonte.charAt(j));
+
+                char primeiroChar = codigoFonte.charAt(j);
+                tokenBuilder.append(primeiroChar);
                 j++;
 
-                while (j < codigoFonte.length()) {
-                    char batedor = codigoFonte.charAt(j);
 
-                    // Para se encontrar espaço ou quebra de linha
-                    if (batedor == ' ' || batedor == '\n' || batedor == '\t') {
-                        break;
-                    }
-
-                    String tokenAtual = tokenBuilder.toString();
-                    String tipoAtual = identificarTipo(tokenAtual);
-                    String tipoProx = identificarTipo(String.valueOf(batedor));
-
-                    // Para se o tipo mudar
-                    if (!tipoAtual.equals(tipoProx)) {
-                        if ((tokenAtual.equals("+") &&(batedor == '+'|| batedor =='=' ))){
+                char batedor = codigoFonte.charAt(j);
+                // Trata LITERAL especial
+                if (primeiroChar == '"' ) {
+                    while (true) {
+                        if(j < codigoFonte.length()) {
+                            batedor = codigoFonte.charAt(j);
                             tokenBuilder.append(batedor);
                             j++;
-                            break;
-                        }else if (tokenAtual.equals("-") && (batedor == '-'||batedor == '=') ){
-                            tokenBuilder.append(batedor);
-                            j++;
-                            break;
-                        } else if ((tokenAtual.equals("<")|| tokenAtual.equals(">")||
-                                    tokenAtual.equals("!")|| tokenAtual.equals("="))
-                                    && batedor == '=') {
-                            tokenBuilder.append(batedor);
-                            j++;
-                            break;
-                        } else if (tokenAtual.equals("&") && batedor =='&') {
-                            tokenBuilder.append(batedor);
-                            j++;
-                            break;
-                        } else if (tokenAtual.equals("|")&& batedor =='|') {
-                            tokenBuilder.append(batedor);
-                            j++;
-                            break;
-                        } else {
+                            if (batedor == '"') {
+                                break;
+                            }
+                        }else {
+                            IO.println("LITERAL NAO FECHADO");
+                            j=i;
+                            tokenBuilder = new StringBuilder();
+                            batedor = codigoFonte.charAt(j);
+                            while(j<codigoFonte.length() && batedor != '\n'){
+                                batedor = codigoFonte.charAt(j);
+                                if(batedor!= '\n'){
+                                    tokenBuilder.append(batedor);
+                                }
+                                j++;
+                            }
+                            linha++;
+                            coluna=0;
+                            i=j;
                             break;
                         }
-                    }else {
-                        tokenBuilder.append(batedor);
+                    }
+                } else if(primeiroChar == '\'') {
+                    batedor = codigoFonte.charAt(j);
+                    tokenBuilder.append(batedor);
+                    j++;
+                    if (j < codigoFonte.length() && codigoFonte.charAt(j) == '\'') {
+                        tokenBuilder.append('\'');
                         j++;
+                    } else {
+                        IO.println("ERRO: Char não fechado corretamente");
+                    }
+                    //SEM BREAK AQUI
+                }
+                else{
+                    // OUTROS TIPOS
+                    Tipo tipoAtual = gerenciador.getTipoPorPrimeiro(primeiroChar);
+
+
+                    boolean jaFoiPonto = false;
+                    if(tipoAtual!= null && !tipoAtual.getName().equals("SEPARADOR")){
+                        while (j < codigoFonte.length()) {
+                            batedor = codigoFonte.charAt(j);
+
+
+                            // Para se encontrar espaço ou quebra de linha
+                            if (batedor == ' ' || batedor == '\n' || batedor == '\t') {
+                                break;
+                            }
+
+                            String tokenAtual = tokenBuilder.toString();
+                            Tipo tipoProximo = gerenciador.getTipoPorPrimeiro(batedor);
+
+                            // verificação do numero real
+                            if (tipoAtual.getName().equals("NUMERO") && batedor == '.' && !jaFoiPonto) {
+                                tokenBuilder.append(batedor);
+                                j++;
+                                jaFoiPonto = true;
+                                continue;  // Continua lendo
+                            }
+                            if (tipoProximo != null) {
+                                if (tipoAtual.getName().equals(tipoProximo.getName())) {
+                                    tokenBuilder.append(batedor);
+                                    j++;
+                                    continue;
+                                }
+                                else if (tipoAtual.getSeparadoresPossiveis().contains(tipoProximo.getName())) {
+                                    break;// so break sem append
+                                }
+                            }
+                            // Trata casos especiais de operadores compostos
+                            else if (temOperadorComposto(tokenAtual, batedor)) {
+                                tokenBuilder.append(batedor);
+                                j++;
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                        }
                     }
                 }
 
                 String token = tokenBuilder.toString();
-                String tipo = identificarTipo(token);
+                String tipo = gerenciador.identificarTipo(token);
                 Token newToken = new Token(token, linha, coluna, tipo);
                 tokens.add(newToken);
                 IO.println("Token: " + token + " | Tipo: " + tipo);
@@ -142,47 +182,15 @@ public class Main {
         }
     }
 
-   public static String identificarTipo(String token) {
-       if (token.equals("int") || token.equals("for")) { // adicionar mais palavras reservadas
-           return "PALAVRA_RESERVADA";
-       }
-       if (token.length() == 1) {
-           char c = token.charAt(0);
-           if (c == '(' || c == ')' || c == '{' || c == '}' || c == '[' || c == ']' || c == ';' || c == ',') {
-               return "SEPARADOR";
-           }
-       }
-       if (token.matches("[0-9]*")) {
-           return "NUMERO";
-       }
-       if (ehOperadorAritmetico(token)) {
-           return "OPERADOR_ARITMETICO";
-       }
-       if (ehOperadorLogico(token)) {
-           return "OPERADOR_LOGICO";
-       }
-       if ((token.startsWith("\"") && token.endsWith("\"")) ||
-               (token.startsWith("'") && token.endsWith("'"))) {
-           return "LITERAL";
-       }
-       if (token.matches("[a-zA-Z_][a-zA-Z0-9_]*")) {
-           return "IDENTIFICADOR";
-       }
-       else {
-           return "ERRO";
-       }
-    }
-    public static boolean ehOperadorAritmetico(String token) {
-        return token.equals("+") || token.equals("-") || token.equals("*") ||
-               token.equals("/") || token.equals("%") || token.equals("=") ||
-               token.equals("++") || token.equals("--") || token.equals("+=") ||
-               token.equals("-=") || token.equals("*=") || token.equals("/=");
-    }
-
-    public static boolean ehOperadorLogico(String token) {
-        return token.equals("&") || token.equals("|") || token.equals("!=") ||
-               token.equals("<") || token.equals(">") || token.equals("==") ||
-               token.equals("<=") || token.equals(">=") || token.equals("&&") ||
-               token.equals("||") || token.equals("!");
+    // Valida se pode formar operador composto
+    private static boolean temOperadorComposto(String token, char prox) {
+        return (token.equals("+") && (prox == '+' || prox == '=')) ||
+               (token.equals("-") && (prox == '-' || prox == '=')) ||
+               (token.equals("*") && prox == '=') ||
+               (token.equals("/") && prox == '=') ||
+               (token.equals("%") && prox == '=') ||
+               ((token.equals("<") || token.equals(">") || token.equals("!") || token.equals("=")) && prox == '=') ||
+               (token.equals("&") && prox == '&') ||
+               (token.equals("|") && prox == '|');
     }
 }

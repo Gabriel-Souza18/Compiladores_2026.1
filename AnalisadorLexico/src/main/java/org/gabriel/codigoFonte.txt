@@ -1,2 +1,2 @@
-
-i+++ a
+teste = " aberto
+oi = 12
