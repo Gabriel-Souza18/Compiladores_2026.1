@@ -5,16 +5,12 @@ import java.util.regex.Pattern;
 
 public class Tipo {
     private final String name;
-    private final String regexInicio;
-    private final String regexCompleto;
     private final List<String> separadoresPossiveis;
     private final Pattern patternInicio;
     private final Pattern patternCompleto;
 
     public Tipo(String name, String regexInicio, String regexCompleto, List<String> separadoresPossiveis) {
         this.name = name;
-        this.regexInicio = regexInicio;
-        this.regexCompleto = regexCompleto;
         this.separadoresPossiveis = separadoresPossiveis;
         this.patternInicio = Pattern.compile(regexInicio);
         this.patternCompleto = Pattern.compile(regexCompleto);

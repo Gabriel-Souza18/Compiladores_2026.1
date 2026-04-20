@@ -1,1 +1,4 @@
-teste09 =|
+int i;
+i=0;
+test="abc teste";
+90.0
