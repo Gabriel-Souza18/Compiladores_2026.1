@@ -50,7 +50,7 @@ public class Tokens {
         return resultado;
     }
 
-    public void LerProx(){
+    public void lerProx(){
         indexAtual ++;
         tokenAtual = tokens.get(indexAtual);
     }

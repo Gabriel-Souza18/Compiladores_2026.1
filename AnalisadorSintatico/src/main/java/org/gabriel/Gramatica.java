@@ -16,7 +16,7 @@ public class Gramatica {
             Token t = this.tokens.getTokenAtual();
             throw new Exception("ERRO Falta { em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
         }
-        this.tokens.LerProx();
+        this.tokens.lerProx();
         listaComandos();
 
         if (!this.tokens.getTokenAtual().getValor().equals("}")){
@@ -36,7 +36,7 @@ public class Gramatica {
 
         }
         comando();
-        tokens.LerProx();
+        tokens.lerProx();
         listaComandos();
 
  }
@@ -85,12 +85,12 @@ public class Gramatica {
             Token t = tokens.getTokenAtual();
             throw new Exception("ERRO esperava tipo em <Declaracao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
         }
-        tokens.LerProx();
+        tokens.lerProx();
         if (!tokens.getTokenAtual().getTipo().equals(Tipo.IDENTIFICADOR)) {
             Token t = tokens.getTokenAtual();
             throw new Exception("ERRO esperava identificador em <Declaracao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
         }
-        tokens.LerProx();
+        tokens.lerProx();
         if (!tokens.getTokenAtual().getValor().equals(";")) {
             Token t = tokens.getTokenAtual();
             throw new Exception("ERRO esperava ; em <Declaracao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
