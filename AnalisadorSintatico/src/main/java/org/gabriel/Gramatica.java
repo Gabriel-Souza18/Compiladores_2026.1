@@ -13,13 +13,15 @@ public class Gramatica {
 
     public void bloco() throws Exception{
         if (!this.tokens.getTokenAtual().getValor().equals("{")){
-            throw new Exception("Falta {");
+            Token t = this.tokens.getTokenAtual();
+            throw new Exception("ERRO Falta { em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
         }
         this.tokens.LerProx();
         listaComandos();
 
         if (!this.tokens.getTokenAtual().getValor().equals("}")){
-            throw new Exception("Falta }");
+            Token t = this.tokens.getTokenAtual();
+            throw new Exception("ERRO Falta } em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
         }
 
     }
@@ -35,18 +37,16 @@ public class Gramatica {
             return;
         }
 
-        throw new Exception("Token inesperado em <ListaComandos>: " + tokens.getTokenAtual().getValor());
+        Token t = tokens.getTokenAtual();
+        throw new Exception("ERRO Token inesperado em <ListaComandos>: '" + t.getValor() + "' em linha " + t.getLinha() + ", coluna " + t.getColuna());
     }
 
-    private boolean ehInicioComando(Token token) {
+    private boolean ehInicioComando(Token token) throws Exception {
         return token.getTipo() == Tipo.IDENTIFICADOR
                 || token.getValor().equals("if")
                 || token.getValor().equals("while")
                 || token.getValor().equals("{")
-                || token.getValor().equals("int")
-                || token.getValor().equals("float")
-                || token.getValor().equals("char")
-                || token.getValor().equals("bool")
+                || tipo()
                 || token.getValor().equals(";");
     }
 
@@ -76,15 +76,31 @@ public class Gramatica {
             bloco();
             return;
         }
-        throw new Exception("Token inesperado em <ListaComandos>: " + tokens.getTokenAtual().getValor());
+        Token t = tokens.getTokenAtual();
+        throw new Exception("ERRO Token inesperado em <Comando>: '" + t.getValor() + "' em linha " + t.getLinha() + ", coluna " + t.getColuna());
 
     }
     public void declaracao() throws Exception {
-        if (!tipo()) {throw  new Exception("ERRO devia ser um tipo valido");}
+        if (!tipo()) {
+            Token t = tokens.getTokenAtual();
+            throw new Exception("ERRO esperava tipo em <Declaracao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
+        }
         tokens.LerProx();
-        if (!tokens.getTokenAtual().getTipo().equals(Tipo.IDENTIFICADOR)) {throw new Exception("ERRO devia ser um identificador");}
+        if (!tokens.getTokenAtual().getTipo().equals(Tipo.IDENTIFICADOR)) {
+            Token t = tokens.getTokenAtual();
+            throw new Exception("ERRO esperava identificador em <Declaracao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
+        }
+        tokens.LerProx();
+        if (!tokens.getTokenAtual().getValor().equals(";")) {
+            Token t = tokens.getTokenAtual();
+            throw new Exception("ERRO esperava ; em <Declaracao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
+        }
     }
-    public boolean tipo() throws Exception {return true;}
+
+    public boolean tipo() throws Exception {
+        var valor = tokens.getTokenAtual().getValor();
+        return valor.equals("int") || valor.equals("float") || valor.equals("char") || valor.equals("bool");
+    }
     public void atribuicao() throws Exception {}
     public void condicao() throws Exception {}
     public void senao() throws Exception {}

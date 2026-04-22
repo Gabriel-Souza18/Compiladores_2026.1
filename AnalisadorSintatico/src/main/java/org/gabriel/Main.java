@@ -5,8 +5,6 @@ package org.gabriel;
 public class Main {
     static void main() {
         Tokens tokens = new Tokens("src/main/java/org/gabriel/Entrada.txt");
-
-        tokens.printTokens();
         Gramatica gramatica = new Gramatica(tokens);
         try {
             gramatica.programa();
