@@ -93,7 +93,7 @@ public class Gramatica {
         tokens.lerProx();
         if (!tokens.getTokenAtual().getValor().equals(";")) {
             Token t = tokens.getTokenAtual();
-            throw new Exception("ERRO esperava ; em <Declaracao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
+            throw new Exception("ERRO esperava \";\" em <Declaracao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
         }
     }
 
@@ -114,7 +114,30 @@ public class Gramatica {
         tokens.lerProx();
         expressao();
     }
-    public void condicao() throws Exception {}
+
+    public void condicao() throws Exception {
+        if(!tokens.getTokenAtual().getValor().equals("if")){
+            Token t = tokens.getTokenAtual();
+            throw  new Exception("ERRO esperava \"if\" em <condicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+        }
+        tokens.lerProx();
+        if(!tokens.getTokenAtual().getValor().equals("(")){
+            Token t = tokens.getTokenAtual();
+            throw  new Exception("ERRO esperava \"(\" em <condicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+        }
+        tokens.lerProx();
+        expressao();
+        tokens.lerProx();
+
+        if(!tokens.getTokenAtual().getValor().equals(")")){
+            Token t = tokens.getTokenAtual();
+            throw  new Exception("ERRO esperava \")\" em <condicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+        }
+        bloco();
+        tokens.lerProx();
+        senao();
+
+    }
     public void senao() throws Exception {}
     public void repeticao() throws Exception {}
     public void expressao() throws Exception {}
