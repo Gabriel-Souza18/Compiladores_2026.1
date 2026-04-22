@@ -7,6 +7,14 @@ public class Main {
         Tokens tokens = new Tokens("src/main/java/org/gabriel/Entrada.txt");
 
         tokens.printTokens();
+        Gramatica gramatica = new Gramatica(tokens);
+        try {
+            gramatica.programa();
+            IO.println("VALIDO");
+
+        }catch (Exception e){
+            IO.println(e.getMessage());
+        }
     }
 
 }
