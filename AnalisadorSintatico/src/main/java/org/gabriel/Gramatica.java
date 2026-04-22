@@ -133,6 +133,7 @@ public class Gramatica {
             Token t = tokens.getTokenAtual();
             throw  new Exception("ERRO esperava \")\" em <condicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
         }
+        tokens.lerProx();
         bloco();
         tokens.lerProx();
         senao();
