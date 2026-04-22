@@ -101,7 +101,19 @@ public class Gramatica {
         var valor = tokens.getTokenAtual().getValor();
         return valor.equals("int") || valor.equals("float") || valor.equals("char") || valor.equals("bool");
     }
-    public void atribuicao() throws Exception {}
+    public void atribuicao() throws Exception {
+        if(!tokens.getTokenAtual().getTipo().equals("IDENTIFICADOR")) {
+            Token t = tokens.getTokenAtual();
+            throw new Exception("ERRO esperava IDENTIFICADOR em <atribuicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+        }
+        tokens.lerProx();
+        if(!tokens.getTokenAtual().getValor().equals("=")){
+            Token t = tokens.getTokenAtual();
+            throw new Exception("ERRO esperava \"=\" em <atribuicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+        }
+        tokens.lerProx();
+        expressao();
+    }
     public void condicao() throws Exception {}
     public void senao() throws Exception {}
     public void repeticao() throws Exception {}
