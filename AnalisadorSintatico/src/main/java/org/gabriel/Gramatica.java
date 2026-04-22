@@ -30,18 +30,19 @@ public class Gramatica {
         if (tokens.getTokenAtual().getValor().equals("}")) {
             return;
         }
-        // ListaComandos -> Comando ListaComandos
-        if (ehInicioComando(tokens.getTokenAtual())) {
-            comando();
-            listaComandos();
-            return;
+        if (!ehInicioComando()){
+            Token t = tokens.getTokenAtual();
+            throw new Exception("ERRO Token inesperado em <ListaComandos>: '" + t.getValor() + "' em linha " + t.getLinha() + ", coluna " + t.getColuna());
+
         }
+        comando();
+        tokens.LerProx();
+        listaComandos();
 
-        Token t = tokens.getTokenAtual();
-        throw new Exception("ERRO Token inesperado em <ListaComandos>: '" + t.getValor() + "' em linha " + t.getLinha() + ", coluna " + t.getColuna());
-    }
+ }
 
-    private boolean ehInicioComando(Token token) throws Exception {
+    private boolean ehInicioComando() throws Exception {
+        var token = tokens.getTokenAtual();
         return token.getTipo() == Tipo.IDENTIFICADOR
                 || token.getValor().equals("if")
                 || token.getValor().equals("while")
@@ -51,7 +52,6 @@ public class Gramatica {
     }
 
     public void comando() throws Exception {
-        tokens.LerProx();
         if (tokens.getTokenAtual().getValor().equals(";")) {return;}
 
         else if(tokens.getTokenAtual().getTipo().equals(Tipo.IDENTIFICADOR)) {
