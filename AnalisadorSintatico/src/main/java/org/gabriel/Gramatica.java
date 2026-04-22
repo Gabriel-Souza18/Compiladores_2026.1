@@ -14,14 +14,14 @@ public class Gramatica {
     public void bloco() throws Exception{
         if (!this.tokens.getTokenAtual().getValor().equals("{")){
             Token t = this.tokens.getTokenAtual();
-            throw new Exception("ERRO Falta { em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
+            throw new Exception("ERRO <bloco> Falta { em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
         }
         this.tokens.lerProx();
         listaComandos();
 
         if (!this.tokens.getTokenAtual().getValor().equals("}")){
             Token t = this.tokens.getTokenAtual();
-            throw new Exception("ERRO Falta } em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
+            throw new Exception("ERRO <bloco> falta } em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
         }
 
     }
@@ -138,7 +138,15 @@ public class Gramatica {
         senao();
 
     }
-    public void senao() throws Exception {}
+
+    public void senao() throws Exception {
+        if(!tokens.getTokenAtual().getValor().equals("else")){
+            return; // Sem else
+        }
+        tokens.lerProx();
+        bloco();
+    }
+
     public void repeticao() throws Exception {}
     public void expressao() throws Exception {}
     public void operador() throws Exception {}
