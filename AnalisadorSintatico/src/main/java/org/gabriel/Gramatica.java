@@ -183,9 +183,17 @@ public class Gramatica {
 <For''> ::= <Expressao> | ε
 <For'''> ::= <Expressao> | ε
 
-<Expressao> ::= <Fator> <Operador> <Fator>
+<Expressao> ::= <Arit> <Logico>
+<Logico> ::= OPERADOR_LOGICO <Arit> <Logico> | ε
 
-<Operador> ::= OPERADOR_LOGICO | OPERADOR_ARITMETICO
+<Arit> ::= <Termo> < Soma>
 
-<Fator> ::= IDENTIFICADOR | NUMERO | LITERAL | "true" | "false" | "(" <Expressao> ")" | "!" <Fator> | "-" <Fator>
+<Soma> ::= <Soma'> <Termo> <Soma> | ε
+<Soma'> ::= "+" | "-"
+
+<Termo> ::= <Fator> < Mult>
+<Mult> ::= <Mult'> <Fator> <Mult> | ε
+<Mult'> ::= "*" | "/"
+
+<Fator> ::= IDENTIFICADOR | NUMERO | LITERAL | "True" | "False" | "(" <Expressao> ")"
  */
