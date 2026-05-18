@@ -162,7 +162,11 @@ public class Gramatica {
 
 <Comando> ::= <Atribuicao> | <Condicao> | <Repeticao> | <Bloco> | <Declaracao> | ";"
 
-<Declaracao> ::= <Tipo> IDENTIFICADOR ";"
+<Declaracao> ::= <Tipo> <Lista Declarador> ";"
+<Lista Declarador> ::= <Declarador> <Lista Declarador'>
+<Lista Declarador'> ::= "," <Declarador> <Lista Declarador'> | ε
+<Declarador>::= IDENTIFICADOR <Declarador'>
+<Declarador'> ::= "=" <Expressao> | ε
 
 <Tipo> ::= "int" | "float" | "char" | "bool"
 
