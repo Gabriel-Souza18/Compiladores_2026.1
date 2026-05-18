@@ -81,20 +81,49 @@ public class Gramatica {
 
     }
     public void declaracao() throws Exception {
-        if (!tipo()) {
-            Token t = tokens.getTokenAtual();
-            throw new Exception("ERRO esperava tipo em <Declaracao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
+            if (!tipo()) {
+                Token t = tokens.getTokenAtual();
+                throw new Exception("ERRO esperava tipo em <Declaracao> em linha " +
+                        t.getLinha() + ", coluna " + t.getColuna());
+            }
+            tokens.lerProx();
+            listaDeclaracao();
+            if (!tokens.getTokenAtual().getValor().equals(";") ){
+                var  t = tokens.getTokenAtual();
+                throw new Exception("ERRO Falta \";\" "+ " em linha " + t.getLinha() + ", coluna " + t.getColuna());
+            }
+    }
+    public void listaDeclaracao() throws Exception{
+        declarador();
+        listaDeclaracao1();
+    }
+    public void listaDeclaracao1() throws Exception{
+
+        if (tokens.getTokenAtual().getValor().equals(",") ){
+            tokens.lerProx();
+            declarador();
+            listaDeclaracao1();
+        }
+        //vazio
+
+    }
+    public void declarador() throws Exception{
+        if(!tokens.getTokenAtual().getTipo().equals(Tipo.IDENTIFICADOR)){
+            var t = tokens.getTokenAtual();
+            throw new Exception("ERRO esperava IDENTIFICADOR em <Declarador> em linha " +
+                    t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
         }
         tokens.lerProx();
-        if (!tokens.getTokenAtual().getTipo().equals(Tipo.IDENTIFICADOR)) {
-            Token t = tokens.getTokenAtual();
-            throw new Exception("ERRO esperava identificador em <Declaracao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
+        declarador1();
+    }
+    public void declarador1() throws Exception{
+
+        if (tokens.getTokenAtual().getValor().equals("=") ){
+            tokens.lerProx();
+            expressao();
+
         }
-        tokens.lerProx();
-        if (!tokens.getTokenAtual().getValor().equals(";")) {
-            Token t = tokens.getTokenAtual();
-            throw new Exception("ERRO esperava \";\" em <Declaracao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
-        }
+
     }
 
     public boolean tipo() throws Exception {
@@ -113,6 +142,7 @@ public class Gramatica {
         }
         tokens.lerProx();
         expressao();
+
     }
 
     public void condicao() throws Exception {
@@ -149,7 +179,9 @@ public class Gramatica {
     }
 
     public void repeticao() throws Exception {}
-    public void expressao() throws Exception {}
+    public void expressao() throws Exception {
+        tokens.lerProx();
+    }
     public void operador() throws Exception {}
     public void fator() throws Exception {}
 }
