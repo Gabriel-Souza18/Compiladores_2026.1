@@ -176,7 +176,12 @@ public class Gramatica {
 
 <Senao> ::= "else" <Bloco> | ε
 
-<Repeticao> ::= "while" "(" <Expressao> ")" <Bloco>
+<Repeticao> ::= "while" "(" <Expressao> ")" <Bloco>|
+                 "for" "(" <For'> ";" <For''> ";" <For'''> ")" <Bloco>
+
+<For'> ::= <Tipo> <ListaDeclarador> | <Expressao> |ε
+<For''> ::= <Expressao> | ε
+<For'''> ::= <Expressao> | ε
 
 <Expressao> ::= <Fator> <Operador> <Fator>
 
