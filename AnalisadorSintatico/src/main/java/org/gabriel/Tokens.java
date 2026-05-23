@@ -63,5 +63,7 @@ public class Tokens {
             IO.print(token.toString());
         }
     }
-
+    public boolean temProximo() {
+        return indexAtual + 1 < tokens.size();
+    }
 }
