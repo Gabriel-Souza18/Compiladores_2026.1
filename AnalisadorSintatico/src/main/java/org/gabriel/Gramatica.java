@@ -46,6 +46,7 @@ public class Gramatica {
         return token.getTipo() == Tipo.IDENTIFICADOR
                 || token.getValor().equals("if")
                 || token.getValor().equals("while")
+                || token.getValor().equals("for")
                 || token.getValor().equals("{")
                 || tipo()
                 || token.getValor().equals(";");
@@ -64,7 +65,8 @@ public class Gramatica {
             return;
         }
 
-        else if(tokens.getTokenAtual().getValor().equals("while")){
+        else if(tokens.getTokenAtual().getValor().equals("while")||
+                tokens.getTokenAtual().getValor().equals("for")){
             repeticao();
             return;
         }
@@ -178,9 +180,89 @@ public class Gramatica {
         bloco();
     }
 
-    public void repeticao() throws Exception {}
+    public void repeticao() throws Exception {
+        if(tokens.getTokenAtual().getValor().equals("while")){
+            tokens.lerProx();
+            if(!tokens.getTokenAtual().getValor().equals("(")){
+                Token t = tokens.getTokenAtual();
+                throw  new Exception("ERRO esperava \")\" em <repeticao> em linha "
+                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+            }
+            expressao();
+            tokens.lerProx();
+            if(!tokens.getTokenAtual().getValor().equals(")")){
+                Token t = tokens.getTokenAtual();
+                throw  new Exception("ERRO esperava \"(\" em <repeticao> em linha "
+                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+
+            }
+            bloco();
+            return;
+        }
+        if(tokens.getTokenAtual().getValor().equals("for")){
+            tokens.lerProx();
+            if(!tokens.getTokenAtual().getValor().equals("(")){
+                Token t = tokens.getTokenAtual();
+                throw  new Exception("ERRO esperava \"(\" em <repeticao> em linha "
+                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+            }
+            for1();
+            tokens.lerProx();
+            if(!tokens.getTokenAtual().getValor().equals(";")){
+                Token t = tokens.getTokenAtual();
+                throw  new Exception("ERRO esperava \";\" em <repeticao> em linha "
+                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+            }
+            for2();
+            tokens.lerProx();
+            if(!tokens.getTokenAtual().getValor().equals(";")){
+                Token t = tokens.getTokenAtual();
+                throw  new Exception("ERRO esperava \";\" em <repeticao> em linha "
+                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+            }
+            for3();
+            tokens.lerProx();
+            if(!tokens.getTokenAtual().getValor().equals(")")){
+                Token t = tokens.getTokenAtual();
+                throw  new Exception("ERRO esperava \")\" em <repeticao> em linha "
+                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+            }
+            bloco();
+            return;
+        }
+    }
+    public void for1() throws Exception {
+       if (tokens.getTokenAtual().getValor().equals(";")){
+           return;
+       }
+       if(tipo()){
+           tokens.lerProx();
+           listaDeclaracao();
+       }
+        expressao();
+        return;
+    }
+    public void for2() throws Exception {
+        if (tokens.getTokenAtual().getValor().equals(";")){
+            return;
+        }
+        expressao();
+    }
+    public void for3() throws Exception {
+        if (tokens.getTokenAtual().getValor().equals(")")){
+            return;
+        }
+        expressao();
+    }
     public void expressao() throws Exception {
         tokens.lerProx();
+    }
+
+    public void Logico()throws Exception {}
+    public void Arit() throws Exception {
+    }
+    public void Soma() throws Exception {}
+
     }
     public void operador() throws Exception {}
     public void fator() throws Exception {}
