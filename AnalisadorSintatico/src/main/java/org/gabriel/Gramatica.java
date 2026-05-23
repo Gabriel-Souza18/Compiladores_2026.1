@@ -155,30 +155,29 @@ public class Gramatica {
 
     }
 
-    public void condicao() throws Exception {
-        if(!tokens.getTokenAtual().getValor().equals("if")){
-            Token t = tokens.getTokenAtual();
-            throw  new Exception("ERRO esperava \"if\" em <condicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
-        }
-        tokens.lerProx();
-        if(!tokens.getTokenAtual().getValor().equals("(")){
-            Token t = tokens.getTokenAtual();
-            throw  new Exception("ERRO esperava \"(\" em <condicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
-        }
-        tokens.lerProx();
-        expressao();
-        tokens.lerProx();
+     public void condicao() throws Exception {
+         if(!tokens.getTokenAtual().getValor().equals("if")){
+             Token t = tokens.getTokenAtual();
+             throw  new Exception("ERRO esperava \"if\" em <condicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+         }
+         tokens.lerProx();
+         if(!tokens.getTokenAtual().getValor().equals("(")){
+             Token t = tokens.getTokenAtual();
+             throw  new Exception("ERRO esperava \"(\" em <condicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+         }
+         tokens.lerProx();
+         expressao();
 
-        if(!tokens.getTokenAtual().getValor().equals(")")){
-            Token t = tokens.getTokenAtual();
-            throw  new Exception("ERRO esperava \")\" em <condicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
-        }
-        tokens.lerProx();
-        bloco();
-        tokens.lerProx();
-        senao();
+         if(!tokens.getTokenAtual().getValor().equals(")")){
+             Token t = tokens.getTokenAtual();
+             throw  new Exception("ERRO esperava \")\" em <condicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+         }
+         tokens.lerProx();
+         bloco();
+         tokens.lerProx();
+         senao();
 
-    }
+     }
 
     public void senao() throws Exception {
         if(!tokens.getTokenAtual().getValor().equals("else")){
@@ -189,160 +188,188 @@ public class Gramatica {
     }
 
     public void repeticao() throws Exception {
-        if(tokens.getTokenAtual().getValor().equals("while")){
-            lerProxSeguro("Repeticao");
-            if(!tokens.getTokenAtual().getValor().equals("(")){
-                Token t = tokens.getTokenAtual();
-                throw  new Exception("ERRO esperava \")\" em <repeticao> em linha "
-                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
-            }
-            lerProxSeguro("Repeticao");
-            expressao();
-            lerProxSeguro("Repeticao");
-            if(!tokens.getTokenAtual().getValor().equals(")")){
-                Token t = tokens.getTokenAtual();
-                throw  new Exception("ERRO esperava \"(\" em <repeticao> em linha "
-                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+         if(tokens.getTokenAtual().getValor().equals("while")){
+             lerProxSeguro("Repeticao");  // consume "while"
+             if(!tokens.getTokenAtual().getValor().equals("(")){
+                 Token t = tokens.getTokenAtual();
+                 throw  new Exception("ERRO esperava \"(\" em <repeticao> em linha "
+                         + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+             }
+             lerProxSeguro("Repeticao");  // consume "("
+             expressao();
+             if(!tokens.getTokenAtual().getValor().equals(")")){
+                 Token t = tokens.getTokenAtual();
+                 throw  new Exception("ERRO esperava \")\" em <repeticao> em linha "
+                         + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
 
-            }
-            bloco();
+             }
+             lerProxSeguro("Repeticao");  // consume ")"
+             bloco();
+             return;
+         }
+         if(tokens.getTokenAtual().getValor().equals("for")){
+             lerProxSeguro("Repeticao");  // consume "for"
+             if(!tokens.getTokenAtual().getValor().equals("(")){
+                 Token t = tokens.getTokenAtual();
+                 throw  new Exception("ERRO esperava \"(\" em <repeticao> em linha "
+                         + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+             }
+             lerProxSeguro("Repeticao");  // consume "("
+             for1();
+             if(!tokens.getTokenAtual().getValor().equals(";")){
+                 Token t = tokens.getTokenAtual();
+                 throw  new Exception("ERRO esperava \";\" em <repeticao> em linha "
+                         + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+             }
+             lerProxSeguro("Repeticao");  // consume ";"
+             for2();
+             if(!tokens.getTokenAtual().getValor().equals(";")){
+                 Token t = tokens.getTokenAtual();
+                 throw  new Exception("ERRO esperava \";\" em <repeticao> em linha "
+                         + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+             }
+             lerProxSeguro("Repeticao");  // consume ";"
+             for3();
+             if(!tokens.getTokenAtual().getValor().equals(")")){
+                 Token t = tokens.getTokenAtual();
+                 throw  new Exception("ERRO esperava \")\" em <repeticao> em linha "
+                         + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+             }
+             lerProxSeguro("Repeticao");  // consume ")"
+             bloco();
+             return;
+         }
+     }
+     public void for1() throws Exception {
+        if (tokens.getTokenAtual().getValor().equals(";")){
             return;
         }
-        if(tokens.getTokenAtual().getValor().equals("for")){
-            lerProxSeguro("Repeticao");
-            if(!tokens.getTokenAtual().getValor().equals("(")){
-                Token t = tokens.getTokenAtual();
-                throw  new Exception("ERRO esperava \")\" em <repeticao> em linha "
-                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
-            }
-            for1();
-            lerProxSeguro("Repeticao");
-            if(!tokens.getTokenAtual().getValor().equals(";")){
-                Token t = tokens.getTokenAtual();
-                throw  new Exception("ERRO esperava \";\" em <repeticao> em linha "
-                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
-            }
-            for2();
-            lerProxSeguro("Repeticao");
-            if(!tokens.getTokenAtual().getValor().equals(";")){
-                Token t = tokens.getTokenAtual();
-                throw  new Exception("ERRO esperava \";\" em <repeticao> em linha "
-                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
-            }
-            for3();
-            lerProxSeguro("Repeticao");
-            if(!tokens.getTokenAtual().getValor().equals(")")){
-                Token t = tokens.getTokenAtual();
-                throw  new Exception("ERRO esperava \")\" em <repeticao> em linha "
-                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
-            }
-            bloco();
+        if(tipo()){
+            tokens.lerProx();
+            listaDeclaracao();
             return;
         }
-    }
-    public void for1() throws Exception {
-       if (tokens.getTokenAtual().getValor().equals(";")){
-           return;
-       }
-       if(tipo()){
-           tokens.lerProx();
-           listaDeclaracao();
-       }
+        if(tokens.getTokenAtual().getTipo().equals(Tipo.IDENTIFICADOR)){
+            tokens.lerProx();
+            if(tokens.getTokenAtual().getValor().equals("=")){
+                tokens.lerProx();
+                expressao();
+                return;
+            }
+            // Caso não seja "=", o token já foi consumido (identificador)
+            // Continua parseando como expressão aritmética
+            mult();
+            soma();
+            logico();
+            return;
+        }
         expressao();
         return;
-    }
+     }
     public void for2() throws Exception {
         if (tokens.getTokenAtual().getValor().equals(";")){
             return;
         }
         expressao();
     }
-    public void for3() throws Exception {
-        if (tokens.getTokenAtual().getValor().equals(")")){
-            return;
-        }
-        expressao();
-    }
+     public void for3() throws Exception {
+         if (tokens.getTokenAtual().getValor().equals(")")){
+             return;
+         }
+         if(tokens.getTokenAtual().getTipo().equals(Tipo.IDENTIFICADOR)){
+             tokens.lerProx();
+             if(tokens.getTokenAtual().getValor().equals("=")){
+                 tokens.lerProx();
+                 expressao();
+                 return;
+             }
+             // Caso não seja "=", o token já foi consumido (identificador)
+             // Precisa fazer backtrack ou continuar parseando como expressão
+             // Vamos voltar o token e parsear como expressão normal
+             // Mas como não temos backtrack, vamos chamar logico() e soma() direto
+             mult();
+             soma();
+             logico();
+             return;
+         }
+         expressao();
+     }
     public void expressao() throws Exception {
-        arit();
-        lerProxSeguro("Expressao");
-        logico();
-        return;
-    }
+         arit();
+         logico();
+         return;
+     }
 
-    public void logico()throws Exception {
-       if(tokens.getTokenAtual().getTipo().equals(Tipo.OPERADOR_LOGICO)){
-          lerProxSeguro("Logico");
-          arit();
-          lerProxSeguro("Logico");
-          logico();
-          return;
-       }
-       return;
-    }
+     public void logico()throws Exception {
+        if(tokens.getTokenAtual().getTipo().equals(Tipo.OPERADOR_LOGICO)){
+           lerProxSeguro("Logico");
+           arit();
+           logico();
+           return;
+        }
+        return;
+     }
     public void arit() throws Exception {
-        termo();
-        lerProxSeguro("Arit");
-        soma();
-    }
+         termo();
+         soma();
+     }
 
     public void soma() throws Exception {
-        if (soma1()){
-            lerProxSeguro("Soma");
-            termo();
-            lerProxSeguro("Soma");
-            soma();
-        }
-    }
+         if (soma1()){
+             lerProxSeguro("Soma");
+             termo();
+             soma();
+         }
+     }
     public boolean soma1() throws Exception {
         return tokens.getTokenAtual().getValor().equals("+") ||
                 tokens.getTokenAtual().getValor().equals("-");
     }
     public void termo() throws Exception {
-        fator();
-        lerProxSeguro("Termo");
-        mult();
-    }
-    public void mult() throws Exception {
-       if( mult1()) {
-           lerProxSeguro("Mult");
-           fator();
-           lerProxSeguro("Mult");
-           mult();
-       }
-    }
+         fator();
+         mult();
+     }
+     public void mult() throws Exception {
+        if( mult1()) {
+            lerProxSeguro("Mult");
+            fator();
+            mult();
+        }
+     }
     public boolean mult1() throws Exception {
         return tokens.getTokenAtual().getValor().equals("*") ||
                 tokens.getTokenAtual().getValor().equals("/");
     }
 
     public void fator() throws Exception {
-        var atual = tokens.getTokenAtual();
+         var atual = tokens.getTokenAtual();
 
-        if(atual.getTipo().equals(Tipo.IDENTIFICADOR)||
-                atual.getTipo().equals(Tipo.NUMERO)||
-                atual.getTipo().equals(Tipo.LITERAL)||
-                atual.getValor().equals("False")||
-                atual.getValor().equals("True")){
-            return;
-        } else if (atual.getValor().equals("(")) {
-            expressao();
-            lerProxSeguro("Fator");
-            if (!tokens.getTokenAtual().getValor().equals(")")){
-                Token t = tokens.getTokenAtual();
-                throw  new Exception("ERRO esperava \")\" em <fator> em linha "
-                        + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+         if(atual.getTipo().equals(Tipo.IDENTIFICADOR)||
+                 atual.getTipo().equals(Tipo.NUMERO)||
+                 atual.getTipo().equals(Tipo.LITERAL)||
+                 atual.getValor().equals("False")||
+                 atual.getValor().equals("True")){
+             lerProxSeguro("Fator");  // consume terminal
+             return;
+         } else if (atual.getValor().equals("(")) {
+             lerProxSeguro("Fator");  // consume "("
+             expressao();
+             if (!tokens.getTokenAtual().getValor().equals(")")){
+                 Token t = tokens.getTokenAtual();
+                 throw  new Exception("ERRO esperava \")\" em <fator> em linha "
+                         + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
 
-            }
-            return;
-        }
-        Token t = tokens.getTokenAtual();
-        throw  new Exception("ERRO expressao invalida"
-                + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+             }
+             lerProxSeguro("Fator");  // consume ")"
+             return;
+         }
+         Token t = tokens.getTokenAtual();
+         throw  new Exception("ERRO expressao invalida"
+                 + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
 
 
 
-    }
+     }
 
 }
 /*
@@ -354,38 +381,36 @@ public class Gramatica {
 
 <Comando> ::= <Atribuicao> | <Condicao> | <Repeticao> | <Bloco> | <Declaracao> | ";"
 
-<Declaracao> ::= <Tipo> <Lista Declarador> ";"
-<Lista Declarador> ::= <Declarador> <Lista Declarador'>
-<Lista Declarador'> ::= "," <Declarador> <Lista Declarador'> | ε
-<Declarador>::= IDENTIFICADOR <Declarador'>
+<Declaracao> ::= <Tipo> <ListaDeclaracao> ";"
+<ListaDeclaracao> ::= <Declarador> <ListaDeclaracao'>
+<ListaDeclaracao'> ::= "," <Declarador> <ListaDeclaracao'> | ε
+<Declarador> ::= IDENTIFICADOR <Declarador'>
 <Declarador'> ::= "=" <Expressao> | ε
 
 <Tipo> ::= "int" | "float" | "char" | "bool"
 
-<Atribuicao> ::= IDENTIFICADOR "=" <Expressao> ";"
+<Atribuicao> ::= IDENTIFICADOR "=" <Expressao>
 
 <Condicao> ::= "if" "(" <Expressao> ")" <Bloco> <Senao>
 
 <Senao> ::= "else" <Bloco> | ε
 
-<Repeticao> ::= "while" "(" <Expressao> ")" <Bloco>|
-                 "for" "(" <For'> ";" <For''> ";" <For'''> ")" <Bloco>
+<Repeticao> ::= "while" "(" <Expressao> ")" <Bloco> |
+                 "for" "(" <For1> ";" <For2> ";" <For3> ")" <Bloco>
 
-<For'> ::= <Tipo> <ListaDeclarador> | <Expressao> |ε
-<For''> ::= <Expressao> | ε
-<For'''> ::= <Expressao> | ε
+<For1> ::= <Tipo> <ListaDeclaracao> | IDENTIFICADOR "=" <Expressao> | <Expressao> | ε
+<For2> ::= <Expressao> | ε
+<For3> ::= <Expressao> | ε
 
 <Expressao> ::= <Arit> <Logico>
 <Logico> ::= OPERADOR_LOGICO <Arit> <Logico> | ε
 
-<Arit> ::= <Termo> < Soma>
+<Arit> ::= <Termo> <Soma>
 
-<Soma> ::= <Soma'> <Termo> <Soma> | ε
-<Soma'> ::= "+" | "-"
+<Soma> ::= "+" <Termo> <Soma> | "-" <Termo> <Soma> | ε
 
-<Termo> ::= <Fator> < Mult>
-<Mult> ::= <Mult'> <Fator> <Mult> | ε
-<Mult'> ::= "*" | "/"
+<Termo> ::= <Fator> <Mult>
+<Mult> ::= "*" <Fator> <Mult> | "/" <Fator> <Mult> | ε
 
 <Fator> ::= IDENTIFICADOR | NUMERO | LITERAL | "True" | "False" | "(" <Expressao> ")"
  */
