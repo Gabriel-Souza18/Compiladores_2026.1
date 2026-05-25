@@ -8,10 +8,13 @@ public class Main {
         Gramatica gramatica = new Gramatica(tokens);
         try {
             gramatica.programa();
-            IO.println("VALIDO");
-
-        }catch (Exception e){
+        } catch (Exception e) {
+            // Erros estruturais fora de listaComandos (ex.: falta de '{' no bloco raiz)
             IO.println(e.getMessage());
+        }
+
+        if (gramatica.getErros() == 0) {
+            IO.println("VALIDO");
         }
     }
 

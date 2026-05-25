@@ -2,9 +2,16 @@ package org.gabriel;
 
 
 public class Gramatica {
-    Tokens  tokens;
+    Tokens tokens;
+    private int erros = 0;
+
     public Gramatica(Tokens tokens) {
         this.tokens = tokens;
+    }
+
+    /** Retorna o número de erros encontrados durante a análise. */
+    public int getErros() {
+        return erros;
     }
 
     private void lerProxSeguro(String contexto) throws Exception {
@@ -35,19 +42,39 @@ public class Gramatica {
     }
     public void listaComandos() throws Exception {
 
-        if (tokens.getTokenAtual().getValor().equals("}")) {
+        if (tokens.getTokenAtual().getValor().equals("}") || tokens.isEOF()) {
             return;
         }
-        if (!ehInicioComando()){
+
+        if (!ehInicioComando()) {
             Token t = tokens.getTokenAtual();
             throw new Exception("ERRO Token inesperado em <ListaComandos>: '" + t.getValor() + "' em linha " + t.getLinha() + ", coluna " + t.getColuna());
-
         }
-        comando();
-        tokens.lerProx();
-        listaComandos();
 
- }
+        try {
+            comando();
+            // Só avança após o comando se não estamos no '}' ou EOF
+            if (!tokens.getTokenAtual().getValor().equals("}") && !tokens.isEOF()) {
+                tokens.lerProx();
+            }
+        } catch (Exception e) {
+            // --- Recuperação de erros (modo pânico) ---
+            erros++;
+            IO.println(e.getMessage());
+
+            // Avança até o próximo ";"
+            tokens.skipUntilSemicolon();
+
+            // Se encontrou ";", consome-o e continua; se EOF, encerra
+            if (!tokens.isEOF()) {
+                tokens.lerProx(); // consome o ";"
+            } else {
+                return;
+            }
+        }
+
+        listaComandos();
+    }
 
     private boolean ehInicioComando() throws Exception {
         var token = tokens.getTokenAtual();
@@ -364,8 +391,8 @@ public class Gramatica {
              return;
          }
          Token t = tokens.getTokenAtual();
-         throw  new Exception("ERRO expressao invalida"
-                 + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+         throw  new Exception("ERRO expressao invalida em linha "
+                  + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
 
 
 

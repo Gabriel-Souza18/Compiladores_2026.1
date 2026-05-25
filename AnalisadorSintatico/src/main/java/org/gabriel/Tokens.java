@@ -66,4 +66,14 @@ public class Tokens {
     public boolean temProximo() {
         return indexAtual + 1 < tokens.size();
     }
+
+    public boolean isEOF() {
+        return indexAtual >= tokens.size() - 1;
+    }
+
+    public void skipUntilSemicolon() {
+        while (!isEOF() && !tokenAtual.getValor().equals(";")) {
+            lerProx();
+        }
+    }
 }
