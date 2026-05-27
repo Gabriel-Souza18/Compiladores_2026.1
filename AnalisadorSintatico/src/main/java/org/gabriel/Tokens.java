@@ -71,9 +71,11 @@ public class Tokens {
         return indexAtual >= tokens.size() - 1;
     }
 
-    public void skipUntilSemicolon() {
-        while (!isEOF() && !tokenAtual.getValor().equals(";")) {
-            lerProx();
-        }
-    }
+    public void pularAteSeguro() {
+         while (!isEOF() && (!tokenAtual.getValor().equals(";") &&
+                 !tokenAtual.getValor().equals(")") &&
+                 !tokenAtual.getValor().equals("}"))) {
+             lerProx();
+         }
+   }
 }

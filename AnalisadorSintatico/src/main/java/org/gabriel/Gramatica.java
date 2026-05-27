@@ -67,7 +67,7 @@ public class Gramatica {
             IO.println(e.getMessage());
 
             // Avança até o próximo ";"
-            tokens.skipUntilSemicolon();
+            tokens.pularAteSeguro();
 
             // Se encontrou ";", consome-o e continua; se EOF, encerra
             if (!tokens.isEOF()) {
@@ -292,8 +292,6 @@ public class Gramatica {
                 expressao();
                 return;
             }
-            // Caso não seja "=", o token já foi consumido (identificador)
-            // Continua parseando como expressão aritmética
             mult();
             soma();
             logico();
@@ -319,10 +317,6 @@ public class Gramatica {
                  expressao();
                  return;
              }
-             // Caso não seja "=", o token já foi consumido (identificador)
-             // Precisa fazer backtrack ou continuar parseando como expressão
-             // Vamos voltar o token e parsear como expressão normal
-             // Mas como não temos backtrack, vamos chamar logico() e soma() direto
              mult();
              soma();
              logico();
