@@ -72,9 +72,9 @@ public class Tokens {
     }
 
     public void pularAteSeguro() {
-         while (!isEOF() && (!tokenAtual.getValor().equals(";") &&
-                 !tokenAtual.getValor().equals(")") &&
-                 !tokenAtual.getValor().equals("}"))) {
+         while (!isEOF() && (!tokenAtual.valor().equals(";") &&
+                 !tokenAtual.valor().equals(")") &&
+                 !tokenAtual.valor().equals("}"))) {
              lerProx();
          }
    }
