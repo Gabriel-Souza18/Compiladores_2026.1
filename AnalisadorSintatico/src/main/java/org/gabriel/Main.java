@@ -9,7 +9,6 @@ public class Main {
         try {
             gramatica.programa();
         } catch (Exception e) {
-            // Erros estruturais fora de listaComandos (ex.: falta de '{' no bloco raiz)
             IO.println(e.getMessage());
             gramatica.incrementarErros();
         }
