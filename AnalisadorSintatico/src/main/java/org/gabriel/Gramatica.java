@@ -14,6 +14,10 @@ public class Gramatica {
         return erros;
     }
 
+    public void incrementarErros() {
+        erros++;
+    }
+
     private void lerProxSeguro(String contexto) throws Exception {
         if (!tokens.temProximo()) {
             Token t = tokens.getTokenAtual();
@@ -38,6 +42,9 @@ public class Gramatica {
             Token t = this.tokens.getTokenAtual();
             throw new Exception("ERRO <bloco> falta } em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "')");
         }
+        if (tokens.temProximo()) {
+            this.tokens.lerProx(); // consome o '}'
+        }
 
     }
     public void listaComandos() throws Exception {
@@ -53,10 +60,7 @@ public class Gramatica {
 
         try {
             comando();
-            // Só avança após o comando se não estamos no '}' ou EOF
-            if (!tokens.getTokenAtual().getValor().equals("}") && !tokens.isEOF()) {
-                tokens.lerProx();
-            }
+            // Cada comando já consome seu próprio terminador (';' ou '}')
         } catch (Exception e) {
             // --- Recuperação de erros (modo pânico) ---
             erros++;
@@ -129,6 +133,7 @@ public class Gramatica {
                 var  t = tokens.getTokenAtual();
                 throw new Exception("ERRO Falta \";\" "+ " em linha " + t.getLinha() + ", coluna " + t.getColuna());
             }
+            tokens.lerProx(); // consome o ';'
     }
     public void listaDeclaracao() throws Exception{
         declarador();
@@ -179,6 +184,11 @@ public class Gramatica {
         }
         tokens.lerProx();
         expressao();
+        if (!tokens.getTokenAtual().getValor().equals(";")) {
+            Token t = tokens.getTokenAtual();
+            throw new Exception("ERRO Falta \";\" em <atribuicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
+        }
+        tokens.lerProx(); // consome o ';'
 
     }
 
@@ -200,8 +210,7 @@ public class Gramatica {
              throw  new Exception("ERRO esperava \")\" em <condicao> em linha " + t.getLinha() + ", coluna " + t.getColuna() + " (token: '" + t.getValor() + "') ");
          }
          tokens.lerProx();
-         bloco();
-         tokens.lerProx();
+         bloco(); // bloco() ja consome o '}'
          senao();
 
      }

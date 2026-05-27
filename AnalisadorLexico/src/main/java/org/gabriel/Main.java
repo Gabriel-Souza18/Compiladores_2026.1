@@ -3,7 +3,7 @@ package org.gabriel;
 import java.util.ArrayList;
 
 public class Main {
-    static void main(String[] args) {
+    public static void main(String[] args) {
         String caminhoEntrada = "src/main/java/org/gabriel/codigoFonte.txt";
         String caminhoSaida = "src/main/java/org/gabriel/tokens.txt";
 
