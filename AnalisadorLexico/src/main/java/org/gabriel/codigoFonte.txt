@@ -5,17 +5,15 @@
         int b = 9 + i;
     }
 
+    for(;;){
+    
+    }
     while(True){
         if (b == 8){
-        
+            teste = b;
         }
     }
-
-    int s =;
-    s = 9
-
-    char b = a + b;
-
-    int c= 3 + * c;
+    int s = 10;
     
 }
+

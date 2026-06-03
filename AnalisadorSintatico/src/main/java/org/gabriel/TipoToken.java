@@ -1,6 +1,6 @@
 package org.gabriel;
 
-public enum Tipo {
+public enum TipoToken {
     NUMERO,
     IDENTIFICADOR,
     PALAVRA_RESERVADA,

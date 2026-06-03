@@ -82,7 +82,7 @@ public class Gramatica {
 
     private boolean ehInicioComando() throws Exception {
         var token = tokens.getTokenAtual();
-        return token.tipo() == Tipo.IDENTIFICADOR
+        return token.tipoToken() == TipoToken.IDENTIFICADOR
                 || token.valor().equals("if")
                 || token.valor().equals("while")
                 || token.valor().equals("for")
@@ -94,7 +94,7 @@ public class Gramatica {
     public void comando() throws Exception {
         if (tokens.getTokenAtual().valor().equals(";")) {return;}
 
-        else if(tokens.getTokenAtual().tipo().equals(Tipo.IDENTIFICADOR)) {
+        else if(tokens.getTokenAtual().tipoToken().equals(TipoToken.IDENTIFICADOR)) {
             atribuicao();
             return;
         }
@@ -150,7 +150,7 @@ public class Gramatica {
 
     }
     public void declarador() throws Exception{
-        if(!tokens.getTokenAtual().tipo().equals(Tipo.IDENTIFICADOR)){
+        if(!tokens.getTokenAtual().tipoToken().equals(TipoToken.IDENTIFICADOR)){
             var t = tokens.getTokenAtual();
             throw new Exception("ERRO esperava IDENTIFICADOR em <Declarador> em linha " +
                     t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
@@ -173,7 +173,7 @@ public class Gramatica {
         return valor.equals("int") || valor.equals("float") || valor.equals("char") || valor.equals("bool");
     }
     public void atribuicao() throws Exception {
-        if(!tokens.getTokenAtual().tipo().equals(Tipo.IDENTIFICADOR)) {
+        if(!tokens.getTokenAtual().tipoToken().equals(TipoToken.IDENTIFICADOR)) {
             Token t = tokens.getTokenAtual();
             throw new Exception("ERRO esperava IDENTIFICADOR em <atribuicao> em linha " + t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
         }
@@ -285,7 +285,7 @@ public class Gramatica {
             listaDeclaracao();
             return;
         }
-        if(tokens.getTokenAtual().tipo().equals(Tipo.IDENTIFICADOR)){
+        if(tokens.getTokenAtual().tipoToken().equals(TipoToken.IDENTIFICADOR)){
             tokens.lerProx();
             if(tokens.getTokenAtual().valor().equals("=")){
                 tokens.lerProx();
@@ -310,7 +310,7 @@ public class Gramatica {
          if (tokens.getTokenAtual().valor().equals(")")){
              return;
          }
-         if(tokens.getTokenAtual().tipo().equals(Tipo.IDENTIFICADOR)){
+         if(tokens.getTokenAtual().tipoToken().equals(TipoToken.IDENTIFICADOR)){
              tokens.lerProx();
              if(tokens.getTokenAtual().valor().equals("=")){
                  tokens.lerProx();
@@ -331,7 +331,7 @@ public class Gramatica {
      }
 
      public void logico()throws Exception {
-        if(tokens.getTokenAtual().tipo().equals(Tipo.OPERADOR_LOGICO)){
+        if(tokens.getTokenAtual().tipoToken().equals(TipoToken.OPERADOR_LOGICO)){
            lerProxSeguro("Logico");
            arit();
            logico();
@@ -374,9 +374,9 @@ public class Gramatica {
     public void fator() throws Exception {
          var atual = tokens.getTokenAtual();
 
-         if(atual.tipo().equals(Tipo.IDENTIFICADOR)||
-                 atual.tipo().equals(Tipo.NUMERO)||
-                 atual.tipo().equals(Tipo.LITERAL)||
+         if(atual.tipoToken().equals(TipoToken.IDENTIFICADOR)||
+                 atual.tipoToken().equals(TipoToken.NUMERO)||
+                 atual.tipoToken().equals(TipoToken.LITERAL)||
                  atual.valor().equals("False")||
                  atual.valor().equals("True")){
              lerProxSeguro("Fator");  // consume terminal

@@ -39,9 +39,9 @@ public class Tokens {
                 String valor = partes[0];
                 int linhaToken = Integer.parseInt(partes[1]);
                 int colunaToken = Integer.parseInt(partes[2]);
-                Tipo tipo = Tipo.valueOf(partes[3]);
+                TipoToken tipoToken = TipoToken.valueOf(partes[3]);
 
-                resultado.add(new Token(valor, linhaToken, colunaToken, tipo));
+                resultado.add(new Token(valor, linhaToken, colunaToken, tipoToken));
             }
         } catch (IOException e) {
             throw new RuntimeException("Erro ao ler arquivo de entrada: " + caminhoEntrada, e);
