@@ -4,9 +4,12 @@ package org.gabriel;
 public class Gramatica {
     Tokens tokens;
     private int erros = 0;
+    Tabela tabela;
+    private TipoVar tipoAtual;  // Rastreia o tipo sendo declarado
 
     public Gramatica(Tokens tokens) {
         this.tokens = tokens;
+        tabela = new Tabela();
     }
 
     /** Retorna o número de erros encontrados durante a análise. */
@@ -27,6 +30,7 @@ public class Gramatica {
     }
     public void programa() throws Exception {
         bloco();
+        tabela.printTabela();
     }
 
 
@@ -127,6 +131,10 @@ public class Gramatica {
                 throw new Exception("ERRO esperava tipo em <Declaracao> em linha " +
                         t.linha() + ", coluna " + t.coluna());
             }
+            // Captura o tipo atual
+            String tipoValor = tokens.getTokenAtual().valor();
+            tipoAtual = converterParaTipoVar(tipoValor);
+
             tokens.lerProx();
             listaDeclaracao();
             if (!tokens.getTokenAtual().valor().equals(";") ){
@@ -155,8 +163,21 @@ public class Gramatica {
             throw new Exception("ERRO esperava IDENTIFICADOR em <Declarador> em linha " +
                     t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
         }
+        // Captura dados do IDENTIFICADOR
+        Token tokenId = tokens.getTokenAtual();
+        String nomeVar = tokenId.valor();
+        Integer linha = tokenId.linha();
+        Integer coluna = tokenId.coluna();
+
         tokens.lerProx();
         declarador1();
+
+        // Adiciona à tabela com valor null (será atribuído em declarador1 se houver inicialização)
+        Variavel var = new Variavel(nomeVar, null, tipoAtual, linha, coluna);
+        Boolean adicionado = tabela.addNaTabela(var);
+        if(!adicionado) {
+            IO.println("AVISO variável '" + nomeVar + "' já foi declarada em linha " + linha + ", coluna " + coluna);
+        }
     }
     public void declarador1() throws Exception{
 
@@ -172,11 +193,28 @@ public class Gramatica {
         var valor = tokens.getTokenAtual().valor();
         return valor.equals("int") || valor.equals("float") || valor.equals("char") || valor.equals("bool");
     }
+
+    private TipoVar converterParaTipoVar(String tipo) {
+        return switch(tipo) {
+            case "int" -> TipoVar.INT;
+            case "float" -> TipoVar.FLOAT;
+            case "char" -> TipoVar.CHAR;
+            case "bool" -> TipoVar.BOOL;
+            default -> null;
+        };
+    }
     public void atribuicao() throws Exception {
         if(!tokens.getTokenAtual().tipoToken().equals(TipoToken.IDENTIFICADOR)) {
             Token t = tokens.getTokenAtual();
             throw new Exception("ERRO esperava IDENTIFICADOR em <atribuicao> em linha " + t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
         }
+        // Verifica se a variável foi declarada
+        String nomeVar = tokens.getTokenAtual().valor();
+        Token tokenVar = tokens.getTokenAtual();
+        if(tabela.estaNaTabela(nomeVar).equals("False")) {
+            IO.println("AVISO variável '" + nomeVar + "' não foi declarada em linha " + tokenVar.linha() + ", coluna " + tokenVar.coluna());
+        }
+
         tokens.lerProx();
         if(!tokens.getTokenAtual().valor().equals("=")){
             Token t = tokens.getTokenAtual();
@@ -276,30 +314,41 @@ public class Gramatica {
              return;
          }
      }
-     public void for1() throws Exception {
-        if (tokens.getTokenAtual().valor().equals(";")){
-            return;
-        }
-        if(tipo()){
-            tokens.lerProx();
-            listaDeclaracao();
-            return;
-        }
-        if(tokens.getTokenAtual().tipoToken().equals(TipoToken.IDENTIFICADOR)){
-            tokens.lerProx();
-            if(tokens.getTokenAtual().valor().equals("=")){
-                tokens.lerProx();
-                expressao();
-                return;
-            }
-            mult();
-            soma();
-            logico();
-            return;
-        }
-        expressao();
-        return;
-     }
+      public void for1() throws Exception {
+         if (tokens.getTokenAtual().valor().equals(";")){
+             return;
+         }
+         if(tipo()){
+             // Captura o tipo para declarações no for
+             String tipoValor = tokens.getTokenAtual().valor();
+             tipoAtual = converterParaTipoVar(tipoValor);
+
+             tokens.lerProx();
+             listaDeclaracao();
+             return;
+         }
+         if(tokens.getTokenAtual().tipoToken().equals(TipoToken.IDENTIFICADOR)){
+             // Verifica se a variável foi declarada (para atribuição no for)
+             String nomeVar = tokens.getTokenAtual().valor();
+             Token tokenVar = tokens.getTokenAtual();
+             if(tabela.estaNaTabela(nomeVar).equals("False")) {
+                 IO.println("AVISO variável '" + nomeVar + "' não foi declarada em linha " + tokenVar.linha() + ", coluna " + tokenVar.coluna());
+             }
+
+             tokens.lerProx();
+             if(tokens.getTokenAtual().valor().equals("=")){
+                 tokens.lerProx();
+                 expressao();
+                 return;
+             }
+             mult();
+             soma();
+             logico();
+             return;
+         }
+         expressao();
+         return;
+      }
     public void for2() throws Exception {
         if (tokens.getTokenAtual().valor().equals(";")){
             return;
@@ -372,29 +421,37 @@ public class Gramatica {
     }
 
     public void fator() throws Exception {
-         var atual = tokens.getTokenAtual();
+          var atual = tokens.getTokenAtual();
 
-         if(atual.tipoToken().equals(TipoToken.IDENTIFICADOR)||
-                 atual.tipoToken().equals(TipoToken.NUMERO)||
-                 atual.tipoToken().equals(TipoToken.LITERAL)||
-                 atual.valor().equals("False")||
-                 atual.valor().equals("True")){
-             lerProxSeguro("Fator");  // consume terminal
-             return;
-         } else if (atual.valor().equals("(")) {
-             lerProxSeguro("Fator");  // consume "("
-             expressao();
-             if (!tokens.getTokenAtual().valor().equals(")")){
-                 Token t = tokens.getTokenAtual();
-                 throw  new Exception("ERRO esperava \")\" em <fator> em linha "
-                         + t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
+          if(atual.tipoToken().equals(TipoToken.IDENTIFICADOR)){
+              // Verifica se a variável foi declarada
+              if(tabela.estaNaTabela(atual.valor()).equals("False")) {
+                  IO.println("AVISO variável '" + atual.valor() + "' não foi declarada em linha " + atual.linha() + ", coluna " + atual.coluna());
+              }
+              lerProxSeguro("Fator");  // consume terminal
+              return;
+          }
+          else if(atual.tipoToken().equals(TipoToken.NUMERO)||
+                  atual.tipoToken().equals(TipoToken.LITERAL)||
+                  atual.valor().equals("False")||
+                  atual.valor().equals("True")){
+              lerProxSeguro("Fator");  // consume literal/keyword
+              return;
+          }
+          else if (atual.valor().equals("(")) {
+              lerProxSeguro("Fator");  // consume "("
+              expressao();
+              if (!tokens.getTokenAtual().valor().equals(")")){
+                  Token t = tokens.getTokenAtual();
+                  throw  new Exception("ERRO esperava \")\" em <fator> em linha "
+                          + t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
 
-             }
-             lerProxSeguro("Fator");  // consume ")"
-             return;
-         }
-         Token t = tokens.getTokenAtual();
-         throw  new Exception("ERRO expressao invalida em linha "
+              }
+              lerProxSeguro("Fator");  // consume ")"
+              return;
+          }
+          Token t = tokens.getTokenAtual();
+          throw  new Exception("ERRO expressao invalida em linha "
                   + t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
 
 
