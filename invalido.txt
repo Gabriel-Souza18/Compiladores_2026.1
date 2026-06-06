@@ -1,0 +1,21 @@
+{
+    int x = 10;
+
+    for(int a =0; i < 4; i = i+1){
+        int b = 9 + i;
+    }
+
+    while(True){
+        if (b == 8){
+        
+        }
+    }
+
+    int s =;
+    s = 9
+
+    char b = a + b;
+
+    int c= 3 + * c;
+    
+}
