@@ -181,14 +181,15 @@ public class Gramatica {
             IO.println("AVISO variável '" + nomeVar + "' já foi declarada neste escopo em linha " + linha + ", coluna " + coluna);
         }
     }
-    public void declarador1() throws Exception{
-
-        if (tokens.getTokenAtual().valor().equals("=") ){
+    public void declarador1() throws Exception {
+        if (tokens.getTokenAtual().valor().equals("=")) {
             tokens.lerProx();
-            expressao();
-
+            TipoVar tipoExpr = expressao();
+            if (TipoVar.compativel(tipoAtual, tipoExpr) == null) {
+                throw new Exception("ERRO tipo incompativel na inicializacao: tipo declarado e "
+                        + tipoAtual + " mas expressao retorna " + tipoExpr);
+            }
         }
-
     }
 
     public boolean tipo() throws Exception {
@@ -210,12 +211,13 @@ public class Gramatica {
             Token t = tokens.getTokenAtual();
             throw new Exception("ERRO esperava IDENTIFICADOR em <atribuicao> em linha " + t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
         }
-        // Verifica se a variável foi declarada
         String nomeVar = tokens.getTokenAtual().valor();
         Token tokenVar = tokens.getTokenAtual();
-        if (tabela.buscar(nomeVar) == null) {
+        Variavel varDecl = tabela.buscar(nomeVar);
+        if (varDecl == null) {
             throw new Exception("ERRO variavel '" + nomeVar + "' nao foi declarada em linha " + tokenVar.linha() + ", coluna " + tokenVar.coluna());
         }
+        TipoVar tipoVar = varDecl.tipo();
 
         tokens.lerProx();
         if (!tokens.getTokenAtual().valor().equals("=")) {
@@ -223,7 +225,13 @@ public class Gramatica {
             throw new Exception("ERRO esperava \"=\" em <atribuicao> em linha " + t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
         }
         tokens.lerProx();
-        expressao();
+        TipoVar tipoExpr = expressao();
+        if (TipoVar.compativel(tipoVar, tipoExpr) == null) {
+            throw new Exception("ERRO tipo incompativel na atribuicao: variavel '"
+                    + nomeVar + "' e do tipo " + tipoVar
+                    + " mas expressao retorna " + tipoExpr
+                    + " em linha " + tokenVar.linha() + ", coluna " + tokenVar.coluna());
+        }
         if (!tokens.getTokenAtual().valor().equals(";")) {
             Token t = tokens.getTokenAtual();
             throw new Exception("ERRO Falta \";\" em <atribuicao> em linha " + t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
@@ -320,7 +328,6 @@ public class Gramatica {
              return;
          }
          if (tipo()) {
-             // Captura o tipo para declarações no for
              String tipoValor = tokens.getTokenAtual().valor();
              tipoAtual = converterParaTipoVar(tipoValor);
              tokens.lerProx();
@@ -330,18 +337,26 @@ public class Gramatica {
          if (tokens.getTokenAtual().tipoToken().equals(TipoToken.IDENTIFICADOR)) {
              String nomeVar = tokens.getTokenAtual().valor();
              Token tokenVar = tokens.getTokenAtual();
-             if (tabela.buscar(nomeVar) == null) {
+             Variavel varDecl = tabela.buscar(nomeVar);
+             if (varDecl == null) {
                  throw new Exception("ERRO variavel '" + nomeVar + "' nao foi declarada em linha " + tokenVar.linha() + ", coluna " + tokenVar.coluna());
              }
+             TipoVar tipoId = varDecl.tipo();
              tokens.lerProx();
              if (tokens.getTokenAtual().valor().equals("=")) {
                  tokens.lerProx();
-                 expressao();
+                 TipoVar tipoExpr = expressao();
+                 if (TipoVar.compativel(tipoId, tipoExpr) == null) {
+                     throw new Exception("ERRO tipo incompativel no for: variavel '"
+                             + nomeVar + "' e do tipo " + tipoId
+                             + " mas expressao retorna " + tipoExpr
+                             + " em linha " + tokenVar.linha() + ", coluna " + tokenVar.coluna());
+                 }
                  return;
              }
-             mult();
-             soma();
-             logico();
+             TipoVar t = mult(tipoId);
+             t = soma(t);
+             logico(t);
              return;
          }
          expressao();
@@ -354,98 +369,144 @@ public class Gramatica {
         expressao();
     }
      public void for3() throws Exception {
-         if (tokens.getTokenAtual().valor().equals(")")){
+         if (tokens.getTokenAtual().valor().equals(")")) {
              return;
          }
-         if(tokens.getTokenAtual().tipoToken().equals(TipoToken.IDENTIFICADOR)){
+         if (tokens.getTokenAtual().tipoToken().equals(TipoToken.IDENTIFICADOR)) {
+             String nomeVar = tokens.getTokenAtual().valor();
+             Token tokenVar = tokens.getTokenAtual();
+             Variavel varDecl = tabela.buscar(nomeVar);
+             if (varDecl == null) {
+                 throw new Exception("ERRO variavel '" + nomeVar + "' nao foi declarada em linha " + tokenVar.linha() + ", coluna " + tokenVar.coluna());
+             }
+             TipoVar tipoId = varDecl.tipo();
              tokens.lerProx();
-             if(tokens.getTokenAtual().valor().equals("=")){
+             if (tokens.getTokenAtual().valor().equals("=")) {
                  tokens.lerProx();
-                 expressao();
+                 TipoVar tipoExpr = expressao();
+                 if (TipoVar.compativel(tipoId, tipoExpr) == null) {
+                     throw new Exception("ERRO tipo incompativel no for: variavel '"
+                             + nomeVar + "' e do tipo " + tipoId
+                             + " mas expressao retorna " + tipoExpr
+                             + " em linha " + tokenVar.linha() + ", coluna " + tokenVar.coluna());
+                 }
                  return;
              }
-             mult();
-             soma();
-             logico();
+             TipoVar t = mult(tipoId);
+             t = soma(t);
+             logico(t);
              return;
          }
          expressao();
      }
-    public void expressao() throws Exception {
-         arit();
-         logico();
-         return;
-     }
+    public TipoVar expressao() throws Exception {
+        TipoVar tipo = arit();
+        return logico(tipo);
+    }
 
-     public void logico()throws Exception {
-        if(tokens.getTokenAtual().tipoToken().equals(TipoToken.OPERADOR_LOGICO)){
-           lerProxSeguro("Logico");
-           arit();
-           logico();
-           return;
+    public TipoVar logico(TipoVar tipoEsq) throws Exception {
+        if (tokens.getTokenAtual().tipoToken().equals(TipoToken.OPERADOR_LOGICO)) {
+            Token op = tokens.getTokenAtual();
+            lerProxSeguro("Logico");
+            TipoVar tipoDir = arit();
+            TipoVar compatibilidade = TipoVar.compativel(tipoEsq, tipoDir);
+            if (compatibilidade == null) {
+                throw new Exception("ERRO tipos incompativeis em operacao logica: "
+                        + tipoEsq + " e " + tipoDir
+                        + " em linha " + op.linha() + ", coluna " + op.coluna());
+            }
+            return logico(TipoVar.BOOL); // operacao logica sempre retorna bool
         }
-        return;
-     }
-    public void arit() throws Exception {
-         termo();
-         soma();
-     }
+        return tipoEsq;
+    }
 
-    public void soma() throws Exception {
-         if (soma1()){
-             lerProxSeguro("Soma");
-             termo();
-             soma();
-         }
-     }
+    public TipoVar arit() throws Exception {
+        TipoVar tipo = termo();
+        return soma(tipo);
+    }
+
+    public TipoVar soma(TipoVar tipoEsq) throws Exception {
+        if (soma1()) {
+            Token op = tokens.getTokenAtual();
+            lerProxSeguro("Soma");
+            TipoVar tipoDir = termo();
+            TipoVar resultado = TipoVar.compativel(tipoEsq, tipoDir);
+            if (resultado == null) {
+                throw new Exception("ERRO tipos incompativeis em '+'/'-': "
+                        + tipoEsq + " e " + tipoDir
+                        + " em linha " + op.linha() + ", coluna " + op.coluna());
+            }
+            return soma(resultado);
+        }
+        return tipoEsq;
+    }
+
     public boolean soma1() throws Exception {
         return tokens.getTokenAtual().valor().equals("+") ||
                 tokens.getTokenAtual().valor().equals("-");
     }
-    public void termo() throws Exception {
-         fator();
-         mult();
-     }
-     public void mult() throws Exception {
-        if( mult1()) {
+
+    public TipoVar termo() throws Exception {
+        TipoVar tipo = fator();
+        return mult(tipo);
+    }
+
+    public TipoVar mult(TipoVar tipoEsq) throws Exception {
+        if (mult1()) {
+            Token op = tokens.getTokenAtual();
             lerProxSeguro("Mult");
-            fator();
-            mult();
+            TipoVar tipoDir = fator();
+            TipoVar resultado = TipoVar.compativel(tipoEsq, tipoDir);
+            if (resultado == null) {
+                throw new Exception("ERRO tipos incompativeis em '*'/'/': "
+                        + tipoEsq + " e " + tipoDir
+                        + " em linha " + op.linha() + ", coluna " + op.coluna());
+            }
+            return mult(resultado);
         }
-     }
+        return tipoEsq;
+    }
+
     public boolean mult1() throws Exception {
         return tokens.getTokenAtual().valor().equals("*") ||
                 tokens.getTokenAtual().valor().equals("/");
     }
 
-    public void fator() throws Exception {
+    public TipoVar fator() throws Exception {
           var atual = tokens.getTokenAtual();
 
           if (atual.tipoToken().equals(TipoToken.IDENTIFICADOR)) {
-              // Uso antes de declarar → ERRO
-              if (tabela.buscar(atual.valor()) == null) {
+              Variavel v = tabela.buscar(atual.valor());
+              if (v == null) {
                   throw new Exception("ERRO variavel '" + atual.valor() + "' nao foi declarada em linha " + atual.linha() + ", coluna " + atual.coluna());
               }
-              lerProxSeguro("Fator");  // consume terminal
-              return;
+              lerProxSeguro("Fator");
+              return v.tipo();
           }
-          else if (atual.tipoToken().equals(TipoToken.NUMERO) ||
-                  atual.tipoToken().equals(TipoToken.LITERAL) ||
-                  atual.valor().equals("False") ||
-                  atual.valor().equals("True")) {
-              lerProxSeguro("Fator");  // consume literal/keyword
-              return;
+          else if (atual.tipoToken().equals(TipoToken.NUMERO)) {
+              // Distingue int de float pelo ponto decimal
+              TipoVar tipo = atual.valor().contains(".") ? TipoVar.FLOAT : TipoVar.INT;
+              lerProxSeguro("Fator");
+              return tipo;
+          }
+          else if (atual.tipoToken().equals(TipoToken.LITERAL)) {
+              lerProxSeguro("Fator");
+              return TipoVar.CHAR;
+          }
+          else if (atual.valor().equals("True") || atual.valor().equals("False")) {
+              lerProxSeguro("Fator");
+              return TipoVar.BOOL;
           }
           else if (atual.valor().equals("(")) {
               lerProxSeguro("Fator");  // consume "("
-              expressao();
+              TipoVar tipo = expressao();
               if (!tokens.getTokenAtual().valor().equals(")")) {
                   Token t = tokens.getTokenAtual();
                   throw new Exception("ERRO esperava \")\" em <fator> em linha "
                           + t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
               }
               lerProxSeguro("Fator");  // consume ")"
-              return;
+              return tipo;
           }
           Token t = tokens.getTokenAtual();
           throw new Exception("ERRO expressao invalida em linha "
