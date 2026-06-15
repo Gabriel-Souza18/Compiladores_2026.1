@@ -12,7 +12,6 @@ public enum TipoVar {
      * char →   char    ERRO    char    ERRO
      * bool →   ERRO    ERRO    ERRO    bool
      *
-     * @return o tipo resultante da operação, ou {@code null} se incompatível (ERRO).
      */
     public static TipoVar compativel(TipoVar a, TipoVar b) {
         if (a == null || b == null) return null;
@@ -38,13 +37,3 @@ public enum TipoVar {
         };
     }
 }
-/*
-tabela de conversao de tipos
-
-x       int     float   string      bool
-int     int     float   string      ERRO
-float           float   string      ERRO
-string                  string      ERRO
-bool                                bool
-
-* */

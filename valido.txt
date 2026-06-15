@@ -1,19 +1,23 @@
 {
     int x = 10;
+    int i = 0;
 
-    for(int a =0; i < 4; i = i+1){
+    for(int a = 0; i < 4; i = i + 1){
         int b = 9 + i;
     }
 
     for(;;){
-    
+        // Bloco vazio
     }
-    while(True){
-        if (b == 8){
-            teste = b;
-        }
-    }
-    int s = 10;
-    
-}
 
+    bool cond = True;
+    while(cond){
+        int b = 8;
+        if (b == 8){
+            int teste = b;
+        }
+        cond = False;
+    }
+
+    int s = 10;
+}

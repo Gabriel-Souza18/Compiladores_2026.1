@@ -39,34 +39,35 @@ public class Main {
                     continue;
                 }
 
-               if (pivo == '/'){ // achar comentario
-                   if (j + 1 < codigoFonte.length()) {
-                       var prox = codigoFonte.charAt(j + 1);
+               if (pivo == '/'){ // achar comentário
+                   int tempJ = i;
+                   if (tempJ + 1 < codigoFonte.length()) {
+                       var prox = codigoFonte.charAt(tempJ + 1);
                        if (prox == '/' ){
                            IO.println("COmentario Linha");
-                           while (j < codigoFonte.length() && codigoFonte.charAt(j) != '\n') {
-                               j++;
+                           while (tempJ < codigoFonte.length() && codigoFonte.charAt(tempJ) != '\n') {
+                               tempJ++;
                            }
-                           i=j;
+                           i=tempJ;
                            continue;
                        }
                        if (prox == '*'){
                            IO.println("Comentario Bloco");
-                           j += 2;
-                           while (j < codigoFonte.length() - 1) {
-                               if (codigoFonte.charAt(j) == '*' && codigoFonte.charAt(j + 1) == '/') {
-                                   j += 2;
+                           tempJ += 2;
+                           while (tempJ < codigoFonte.length() - 1) {
+                               if (codigoFonte.charAt(tempJ) == '*' && codigoFonte.charAt(tempJ + 1) == '/') {
+                                   tempJ += 2;
                                    break;
                                }
-                               if (codigoFonte.charAt(j) == '\n') {
+                               if (codigoFonte.charAt(tempJ) == '\n') {
                                    linha++;
                                    coluna = 0;
                                } else {
                                    coluna++;
                                }
-                               j++;
+                               tempJ++;
                            }
-                           i=j;
+                           i=tempJ;
                            continue;
                        }
                    }

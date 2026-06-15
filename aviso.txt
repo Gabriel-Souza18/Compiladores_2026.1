@@ -1,0 +1,11 @@
+{
+    // Redeclarações no mesmo escopo (geram apenas AVISO e continuam executando)
+    int x = 10;
+    int x = 20;
+
+    float y = 5.5;
+    float y = 10.2;
+
+    bool flag = True;
+    bool flag = False;
+}

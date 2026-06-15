@@ -1,21 +1,27 @@
 {
+    // 1. Redeclaração no mesmo escopo (produz AVISO)
     int x = 10;
+    int x = 20;
 
-    for(int a =0; i < 4; i = i+1){
-        int b = 9 + i;
-    }
+    // 2. Uso de variável não declarada (produz ERRO)
+    y = 5;
 
-    while(True){
-        if (b == 8){
-        
-        }
-    }
+    // 3. Uso de variável não inicializada (produz ERRO)
+    int z;
+    int w = z + 5;
 
-    int s =;
-    s = 9
+    // 4. Incompatibilidade de tipos na inicialização (produz ERRO)
+    int a = True;
 
-    char b = a + b;
+    // 5. Incompatibilidade de tipos na atribuição (produz ERRO)
+    bool b = True;
+    b = 10;
 
-    int c= 3 + * c;
-    
+    // 6. Incompatibilidade de tipos em expressões (produz ERRO)
+    bool flag = True;
+    int erro_soma = flag + 10;
+
+    // 7. Erro de sintaxe (recuperação por ponto e vírgula)
+    int erro_sintaxe = ;
+    int apos_erro = 100;
 }

@@ -78,7 +78,9 @@ public class GerenciadorTipos {
 
     public boolean ehPalavraReservada(String token) {
         return token.equals("int") || token.equals("for") || token.equals("while") ||
-               token.equals("if") || token.equals("else");
+               token.equals("if") || token.equals("else") ||
+               token.equals("float") || token.equals("char") || token.equals("bool") ||
+               token.equals("True") || token.equals("False");
     }
 
     public String identificarTipo(String token) {

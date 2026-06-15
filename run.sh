@@ -77,8 +77,8 @@ set +e
 mvn -q -f "$LEXICO_DIR/pom.xml" exec:java \
     -Dexec.mainClass="org.gabriel.Main" \
     -Dexec.args="$CODIGO_FONTE $TOKENS_FILE" \
-    2>&1
-LEXICO_EXIT=$?
+    2>&1 | grep -v "^WARNING:" || true
+LEXICO_EXIT=${PIPESTATUS[0]}
 set -e
 
 sep
@@ -113,8 +113,8 @@ set +e
 mvn -q -f "$SINTATICO_DIR/pom.xml" exec:java \
     -Dexec.mainClass="org.gabriel.Main" \
     -Dexec.args="$TOKENS_FILE" \
-    2>&1
-SINTATICO_EXIT=$?
+    2>&1 | grep -v "^WARNING:" || true
+SINTATICO_EXIT=${PIPESTATUS[0]}
 set -e
 
 sep
