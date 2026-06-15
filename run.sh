@@ -1,12 +1,20 @@
+#!/usr/bin/env bash
+# =============================================================================
+# run.sh  –  Orquestrador Léxico → Sintático
+#
+# Uso:
+#   ./run.sh <arquivo_de_codigo_fonte>
+#
+# O script:
+#   1. Compila e roda o Léxico passando o arquivo de entrada via args
+#      (gera um arquivo de tokens temporário)
+#   2. Compila e roda o Sintático passando o arquivo de tokens via args
+# =============================================================================
+
 set -euo pipefail
 
-# ---------------------------------------------------------------------------
-# Cores para saída bonita
-# ---------------------------------------------------------------------------
 BOLD='\033[1m'
 CYAN='\033[0;36m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 RED='\033[0;31m'
 RESET='\033[0m'
 
@@ -29,93 +37,91 @@ if [ ! -f "$CODIGO_FONTE" ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Caminhos dos módulos (relativos ao diretório deste script)
+# Caminhos dos módulos
 # ---------------------------------------------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 LEXICO_DIR="$SCRIPT_DIR/AnalisadorLexico"
 SINTATICO_DIR="$SCRIPT_DIR/AnalisadorSintatico"
 
-LEXICO_ENTRADA="$LEXICO_DIR/src/main/java/org/gabriel/codigoFonte.txt"
-LEXICO_SAIDA="$LEXICO_DIR/src/main/java/org/gabriel/tokens.txt"
-SINTATICO_ENTRADA="$SINTATICO_DIR/src/main/java/org/gabriel/Entrada.txt"
+# Arquivo de tokens intermediário (absoluto, sem ambiguidade de diretório)
+TOKENS_FILE="$SCRIPT_DIR/tokens_intermediario.txt"
 
 # ---------------------------------------------------------------------------
 # Cabeçalho
 # ---------------------------------------------------------------------------
-
-echo -e "  Código-fonte : ${YELLOW}${CODIGO_FONTE}${RESET}"
+echo ""
+sep
+echo -e "  ${BOLD}Compiladores 2026.1 – Pipeline Léxico → Sintático${RESET}"
+sep
+echo -e "  Código-fonte : $CODIGO_FONTE"
 echo ""
 
 # ---------------------------------------------------------------------------
-# Passo 1 – Copia o código-fonte para onde o Léxico espera
+# Passo 1 – Compila o Léxico
 # ---------------------------------------------------------------------------
-echo -e "${BOLD} Preparando entrada do Léxico...${RESET}"
-cp "$CODIGO_FONTE" "$LEXICO_ENTRADA"
-echo -e "  Arquivo copiado para: $LEXICO_ENTRADA"
-echo ""
-
-# ---------------------------------------------------------------------------
-# Passo 2 – Compila o Léxico
-# ---------------------------------------------------------------------------
-echo -e "${BOLD} Compilando AnalisadorLexico...${RESET}"
+echo -e "${BOLD}[1/3] Compilando AnalisadorLexico...${RESET}"
 mvn -q -f "$LEXICO_DIR/pom.xml" compile 2>/dev/null
-echo -e "  Compilado com sucesso."
+echo -e "  Compilado."
 echo ""
 
 # ---------------------------------------------------------------------------
-# Passo 3 – Roda o Léxico  (cd para o diretório do projeto para que os
-#            caminhos relativos no código Java sejam resolvidos corretamente)
+# Passo 2 – Roda o Léxico via mvn exec:java -Dexec.args
+#            args[0] = arquivo de entrada
+#            args[1] = arquivo de saída dos tokens
 # ---------------------------------------------------------------------------
-echo -e "${BOLD} Executando Analisador Léxico...${RESET}"
+echo -e "${BOLD}[2/3] Executando Analisador Léxico...${RESET}"
+sep
 
 set +e
-(cd "$LEXICO_DIR" && java -cp target/classes org.gabriel.Main)
+mvn -q -f "$LEXICO_DIR/pom.xml" exec:java \
+    -Dexec.mainClass="org.gabriel.Main" \
+    -Dexec.args="$CODIGO_FONTE $TOKENS_FILE" \
+    2>&1
 LEXICO_EXIT=$?
 set -e
 
-
+sep
 
 if [ $LEXICO_EXIT -ne 0 ]; then
-    echo -e "  ${RED}✘ Analisador Léxico terminou com erro (código $LEXICO_EXIT).${RESET}"
-    echo -e "    Verifique o código-fonte e tente novamente."
+    echo -e "  ${RED}Analisador Léxico terminou com erro (código $LEXICO_EXIT).${RESET}"
     exit $LEXICO_EXIT
 fi
 
-if [ ! -f "$LEXICO_SAIDA" ]; then
-    echo -e "${RED}Erro: o Léxico não gerou o arquivo de tokens: $LEXICO_SAIDA${RESET}"
+if [ ! -f "$TOKENS_FILE" ]; then
+    echo -e "${RED}Erro: arquivo de tokens não foi gerado: $TOKENS_FILE${RESET}"
     exit 1
 fi
 
 echo ""
-echo -e "  Tokens gerados em: $LEXICO_SAIDA"
+echo -e "  Tokens gerados em: $TOKENS_FILE"
 echo ""
-
-# Exibe os tokens gerados
 echo -e "${BOLD}  Tokens produzidos:${RESET}"
 echo ""
-cat "$LEXICO_SAIDA"
+cat "$TOKENS_FILE"
 echo ""
 
 # ---------------------------------------------------------------------------
-# Passo 4 – Copia tokens para onde o Sintático espera
+# Passo 3 – Compila e roda o Sintático via mvn exec:java -Dexec.args
+#            args[0] = arquivo de tokens
 # ---------------------------------------------------------------------------
-echo -e "${BOLD} Passando tokens para o Analisador Sintático...${RESET}"
-cp "$LEXICO_SAIDA" "$SINTATICO_ENTRADA"
-echo -e "  Tokens copiados para: $SINTATICO_ENTRADA"
-echo ""
-
-# ---------------------------------------------------------------------------
-# Passo 5 – Compila e roda o Sintático
-# ---------------------------------------------------------------------------
-echo -e "${BOLD} Compilando e executando AnalisadorSintatico...${RESET}"
+echo -e "${BOLD}[3/3] Compilando e executando AnalisadorSintatico...${RESET}"
 mvn -q -f "$SINTATICO_DIR/pom.xml" compile 2>/dev/null
-
+sep
 
 set +e
-(cd "$SINTATICO_DIR" && java -cp target/classes org.gabriel.Main)
+mvn -q -f "$SINTATICO_DIR/pom.xml" exec:java \
+    -Dexec.mainClass="org.gabriel.Main" \
+    -Dexec.args="$TOKENS_FILE" \
+    2>&1
 SINTATICO_EXIT=$?
 set -e
 
+sep
+echo ""
+
+if [ $SINTATICO_EXIT -ne 0 ]; then
+    echo -e "  ${RED}Analisador Sintático terminou com erro (código $SINTATICO_EXIT).${RESET}"
+fi
 
 echo ""
