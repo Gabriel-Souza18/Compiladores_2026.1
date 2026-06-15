@@ -82,6 +82,21 @@ public class Tabela {
     }
 
     /**
+     * Marca uma variável como inicializada (chamado após atribuição bem-sucedida).
+     * Percorre a pilha do escopo mais interno para o externo.
+     */
+    public void marcarInicializado(String nome) {
+        for (Map<String, Variavel> escopo : pilhaEscopos) {
+            Variavel v = escopo.get(nome);
+            if (v != null) {
+                v.setInicializado(true);
+                return;
+            }
+        }
+    }
+
+
+    /**
      * Imprime todas as variáveis de todos os escopos (já fechados),
      * agrupadas por nível e ordenadas por linha de declaração.
      * Chamado apenas no final da análise.

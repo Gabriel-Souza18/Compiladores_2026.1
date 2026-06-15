@@ -165,23 +165,24 @@ public class Gramatica {
             throw new Exception("ERRO esperava IDENTIFICADOR em <Declarador> em linha " +
                     t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
         }
-        // Captura dados do IDENTIFICADOR
         Token tokenId = tokens.getTokenAtual();
         String nomeVar = tokenId.valor();
         Integer linha = tokenId.linha();
         Integer coluna = tokenId.coluna();
 
         tokens.lerProx();
-        declarador1();
+        boolean foiInicializado = declarador1(); // true se havia '= expressao'
 
-        // Adiciona no escopo atual com o nível correto
-        Variavel var = new Variavel(nomeVar, tipoAtual, linha, coluna, tabela.nivelAtual());
+        Variavel var = new Variavel(nomeVar, tipoAtual, linha, coluna, tabela.nivelAtual(), foiInicializado);
         boolean adicionado = tabela.addNaTabela(var);
         if (!adicionado) {
-            IO.println("AVISO variável '" + nomeVar + "' já foi declarada neste escopo em linha " + linha + ", coluna " + coluna);
+            IO.println("AVISO variavel '" + nomeVar + "' ja foi declarada neste escopo em linha " + linha + ", coluna " + coluna);
         }
     }
-    public void declarador1() throws Exception {
+    /** Processa a inicializacao opcional ('= expressao').
+     * @return true se a variavel foi inicializada, false caso contrario.
+     */
+    public boolean declarador1() throws Exception {
         if (tokens.getTokenAtual().valor().equals("=")) {
             tokens.lerProx();
             TipoVar tipoExpr = expressao();
@@ -189,7 +190,9 @@ public class Gramatica {
                 throw new Exception("ERRO tipo incompativel na inicializacao: tipo declarado e "
                         + tipoAtual + " mas expressao retorna " + tipoExpr);
             }
+            return true; // foi inicializado
         }
+        return false; // sem inicializacao
     }
 
     public boolean tipo() throws Exception {
@@ -236,6 +239,7 @@ public class Gramatica {
             Token t = tokens.getTokenAtual();
             throw new Exception("ERRO Falta \";\" em <atribuicao> em linha " + t.linha() + ", coluna " + t.coluna() + " (token: '" + t.valor() + "') ");
         }
+        tabela.marcarInicializado(nomeVar); // variavel passa a estar inicializada
         tokens.lerProx(); // consome o ';'
     }
 
@@ -352,6 +356,7 @@ public class Gramatica {
                              + " mas expressao retorna " + tipoExpr
                              + " em linha " + tokenVar.linha() + ", coluna " + tokenVar.coluna());
                  }
+                 tabela.marcarInicializado(nomeVar); // inicializada no for
                  return;
              }
              TipoVar t = mult(tipoId);
@@ -390,6 +395,7 @@ public class Gramatica {
                              + " mas expressao retorna " + tipoExpr
                              + " em linha " + tokenVar.linha() + ", coluna " + tokenVar.coluna());
                  }
+                 tabela.marcarInicializado(nomeVar); // inicializada no for
                  return;
              }
              TipoVar t = mult(tipoId);
@@ -479,6 +485,10 @@ public class Gramatica {
               Variavel v = tabela.buscar(atual.valor());
               if (v == null) {
                   throw new Exception("ERRO variavel '" + atual.valor() + "' nao foi declarada em linha " + atual.linha() + ", coluna " + atual.coluna());
+              }
+              if (!v.inicializado()) {
+                  throw new Exception("ERRO variavel '" + v.nome() + "' usada sem ser inicializada em linha "
+                          + atual.linha() + ", coluna " + atual.coluna());
               }
               lerProxSeguro("Fator");
               return v.tipo();
