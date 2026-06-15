@@ -1,10 +1,12 @@
 package org.gabriel;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        Tokens tokens = new Tokens("src/main/java/org/gabriel/Entrada.txt");
+        String arquivo = args.length > 0
+                ? args[0]
+                : "src/main/java/org/gabriel/Entrada.txt";
+
+        Tokens tokens = new Tokens(arquivo);
         Gramatica gramatica = new Gramatica(tokens);
         try {
             gramatica.programa();
@@ -19,5 +21,4 @@ public class Main {
             IO.println("INVALIDO");
         }
     }
-
 }

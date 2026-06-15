@@ -4,9 +4,12 @@ import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
-        String caminhoEntrada = "src/main/java/org/gabriel/codigoFonte.txt";
-        String caminhoSaida = "src/main/java/org/gabriel/tokens.txt";
-
+        String caminhoEntrada = args.length > 0
+                ? args[0]
+                : "src/main/java/org/gabriel/codigoFonte.txt";
+        String caminhoSaida = args.length > 1
+                ? args[1]
+                : "src/main/java/org/gabriel/tokens.txt";
 
         int linha = 0;
         int coluna = 0;
