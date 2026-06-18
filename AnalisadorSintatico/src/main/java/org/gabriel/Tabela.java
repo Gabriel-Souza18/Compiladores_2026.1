@@ -33,8 +33,6 @@ public class Tabela {
                 .sorted((a, b) -> Integer.compare(a.linha(), b.linha()))
                 .forEach(historico::add);
     }
-
-    /** Retorna o nível do escopo atual (0 = global, 1 = primeiro aninhado, ...). */
     public int nivelAtual() {
         return pilhaEscopos.size() - 1;
     }

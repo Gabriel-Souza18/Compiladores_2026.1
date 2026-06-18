@@ -7,9 +7,9 @@ public enum TipoVar {
      * Tabela de compatibilidade de tipos para operações aritméticas/lógicas.
      *
      *          int     float   char    bool
-     * int  →   int     float   char    ERRO
+     * int  →   int     float   ERRO    ERRO
      * float→   float   float   ERRO    ERRO
-     * char →   char    ERRO    char    ERRO
+     * char →   ERRO    ERRO    char    ERRO
      * bool →   ERRO    ERRO    ERRO    bool
      *
      */
@@ -19,7 +19,7 @@ public enum TipoVar {
             case INT -> switch (b) {
                 case INT   -> INT;
                 case FLOAT -> FLOAT;
-                case CHAR  -> CHAR;
+                case CHAR  -> null;
                 case BOOL  -> null;
             };
             case FLOAT -> switch (b) {
@@ -27,8 +27,8 @@ public enum TipoVar {
                 case CHAR, BOOL -> null;
             };
             case CHAR -> switch (b) {
-                case INT, CHAR -> CHAR;
-                case FLOAT, BOOL -> null;
+                case  CHAR -> CHAR;
+                case INT, FLOAT, BOOL -> null;
             };
             case BOOL -> switch (b) {
                 case BOOL  -> BOOL;
